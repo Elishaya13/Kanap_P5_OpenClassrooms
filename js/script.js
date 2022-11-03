@@ -1,7 +1,4 @@
-//On déclare les chemins qui seront utilisés
-const baseFrontURL = window.location.origin + "/html"
-const apiUrl = "http://localhost:3000/api/products/"
-
+import { apiUrl, baseFrontURL } from "./common.js"
 
 //On récupère les données de l'API
 fetch(apiUrl)
@@ -32,7 +29,7 @@ const showArticles = (articles) => {
 
         //On crée la balise <a> avec l'attribut href qui contient l'URL avec l'id de l'article en paramètre
         let articleElt = document.createElement('a')
-        articleElt.setAttribute("href" , `${baseFrontURL}/product.html?id=${article._id}`)
+        articleElt.setAttribute("href", `${baseFrontURL}/product.html?id=${article._id}`)
 
         //On ajoute le contenu html ci-dessous à l'intérieur de la balise <a>
         articleElt.innerHTML =

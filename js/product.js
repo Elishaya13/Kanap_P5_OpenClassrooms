@@ -1,4 +1,4 @@
-const apiUrl = "http://localhost:3000/api/products/"
+import { apiUrl } from "./common.js"
 //On instancie URL en lui passant en paramètre l'adresse de la page
 const url = new URL(window.location.href)
 // On récupère la valeur du paramètre id passée dans l'URL
@@ -6,14 +6,14 @@ const idProduct = url.searchParams.get("id")
 
 
 fetch(apiUrl + idProduct)
-    .then ((r) => {
+    .then((r) => {
         if (r.ok) {
             return r.json()
         } else {
             throw new Error("Requête pas ok")
         }
     })
-    .then ((jsonInfo ) => {
+    .then((jsonInfo) => {
         addPrice(jsonInfo.price)
         addDescription(jsonInfo.description)
         addImg(jsonInfo.imageUrl, jsonInfo.altTxt)
@@ -22,11 +22,11 @@ fetch(apiUrl + idProduct)
     .catch((err) => console.log('une erreur est trouvée :', err))
 
 
- const addPrice = (price) => {
+const addPrice = (price) => {
     document.getElementById("price").innerText = price
 
 }
-const addDescription =  (description) => {
+const addDescription = (description) => {
     document
         .getElementById("description")
         .innerText = description
@@ -44,8 +44,8 @@ const addImg = (imageUrl, altTxt) => {
     //J'efface le commentaire
     imgEltParent.innerHTML = ""
     let imageElt = document.createElement('img')
-    imageElt.setAttribute("src" , `${imageUrl}`)
-    imageElt.setAttribute("alt" , `${altTxt}`)
+    imageElt.setAttribute("src", `${imageUrl}`)
+    imageElt.setAttribute("alt", `${altTxt}`)
     console.log(imageElt)
     imgEltParent.appendChild(imageElt)
 
