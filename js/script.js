@@ -1,5 +1,5 @@
 //On déclare les chemins qui seront utilisés
-const baseFrontURL = window.location.origin + "/front/html"
+const baseFrontURL = window.location.origin + "/html"
 const apiUrl = "http://localhost:3000/api/products/"
 
 
