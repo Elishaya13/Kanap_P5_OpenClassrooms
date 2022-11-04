@@ -1,4 +1,5 @@
 import { apiUrl } from "./common.js"
+
 //On instancie URL en lui passant en paramètre l'adresse de la page
 const url = new URL(window.location.href)
 // On récupère la valeur du paramètre id passée dans l'URL
@@ -14,42 +15,81 @@ fetch(apiUrl + idProduct)
         }
     })
     .then((jsonInfo) => {
-        addPrice(jsonInfo.price)
-        addDescription(jsonInfo.description)
-        addImg(jsonInfo.imageUrl, jsonInfo.altTxt)
+        addProductImg(jsonInfo.imageUrl, jsonInfo.altTxt)
+        addProductName(jsonInfo.name)
+        addProductPrice(jsonInfo.price)
+        addProductDescription(jsonInfo.description)
+        addSelectColorsOption(jsonInfo.colors)
+
 
     })
     .catch((err) => console.log('une erreur est trouvée :', err))
 
 
-const addPrice = (price) => {
-    document.getElementById("price").innerText = price
-
-}
-const addDescription = (description) => {
-    document
-        .getElementById("description")
-        .innerText = description
-
-}
+//-- AddProduct functions --//
 
 /**
  * Add an <img> node with provided attributes into div element containing item__img class
  * @param {String} imageUrl - the image url
  * @param {String} altTxt - the alt image value
  */
-const addImg = (imageUrl, altTxt) => {
+const addProductImg = (imageUrl, altTxt) => {
     let imgEltParent = document.querySelector("div.item__img")
 
     //J'efface le commentaire
     imgEltParent.innerHTML = ""
+
     let imageElt = document.createElement('img')
     imageElt.setAttribute("src", `${imageUrl}`)
     imageElt.setAttribute("alt", `${altTxt}`)
-    console.log(imageElt)
     imgEltParent.appendChild(imageElt)
 
 }
+const addProductName = (productName) => {
+    document
+        .getElementById("title")
+        .innerText = productName
+}
 
-console.log(document.getElementsByClassName("item__img"))
+const addProductPrice = (productPrice) => {
+    document
+        .getElementById("price")
+        .innerText = productPrice
+
+}
+const addProductDescription = (productDescription) => {
+    document
+        .getElementById("description")
+        .innerText = productDescription
+
+}
+
+/**
+ * Loop on json object and write <option> html content
+ * @param {string[]} productColors 
+ */
+const addSelectColorsOption = (productColors) => {
+    let optionParentElt = document.getElementById("colors")
+    //J'efface le commentaire
+    optionParentElt.innerHTML = ""
+
+    //Je recrée la premiere option 
+    let firstOptionElt = document.createElement("option")
+    firstOptionElt.setAttribute("value", " ")
+    firstOptionElt.innerText = "SVP, choississez une couleur"
+    optionParentElt.appendChild(firstOptionElt)
+
+    //pour chaque couleur disponnible dans mon tableau , crée une balise <option> avec la valeur de color
+    for (let color of productColors) {
+
+        let newOptionElt = document.createElement("option")
+        newOptionElt.setAttribute("value", `${color} `)
+        newOptionElt.innerText = color
+
+        optionParentElt.appendChild(newOptionElt)
+
+    }
+}
+
+
 
