@@ -1,6 +1,13 @@
 import { apiUrl, baseFrontURL } from "./common.js"
 
 //On récupère les données de l'API
+//to do a mettre dans une methode
+
+
+
+
+
+
 fetch(apiUrl)
     //On retourne un json si la réponse est 200 sinon on renvoie une erreur
     .then((r) => {
@@ -32,6 +39,7 @@ const showArticles = (articles) => {
         articleElt.setAttribute("href", `${baseFrontURL}/product.html?id=${article._id}`)
 
         //On ajoute le contenu html ci-dessous à l'intérieur de la balise <a>
+        //to do changer en createElement
         articleElt.innerHTML =
             `<article>
                 <img src="${article.imageUrl}" alt="${article.altTxt}"> 
