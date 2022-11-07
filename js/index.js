@@ -1,26 +1,20 @@
 import { apiUrl, baseFrontURL } from "./common.js"
+import { createHtmlElement } from "./common.js"
 
 //On récupère les données de l'API
-//to do a mettre dans une methode
+//To do verifier a faire fonctionner le catch
+/**
+ * 
+ * @returns {Promise<JSON>} Promise object represents the Json of the API
+ */
+const getProducts = async () => {
+    let r = await fetch(apiUrl)
+    let json = await r.json()
+    return json
+}
 
 
 
-
-
-
-fetch(apiUrl)
-    //On retourne un json si la réponse est 200 sinon on renvoie une erreur
-    .then((r) => {
-        if (r.ok) {
-            return r.json();
-        } else {
-            throw new Error("Requête pas ok")
-        }
-    })
-    // On appelle la fonction showArticles en lui passant le json récupéré.
-    .then((json) => showArticles(json))
-
-    .catch((err) => console.log('une erreur est trouvée :', err))
 
 
 /**
@@ -31,27 +25,49 @@ const showArticles = (articles) => {
     //On récupère l'élément parent
     let itemsElt = document.getElementById('items')
 
-    //On boucle sur chaque article
+    //On boucle sur chaque article pour y créer et ajouter la balise <a> et son attribut href
     for (let article of articles) {
 
         //On crée la balise <a> avec l'attribut href qui contient l'URL avec l'id de l'article en paramètre
-        let articleElt = document.createElement('a')
-        articleElt.setAttribute("href", `${baseFrontURL}/product.html?id=${article._id}`)
+        let anchorElt = createHtmlElement('a', {
+            href: `${baseFrontURL}/product.html?id=${article._id}`
+        })
+        itemsElt.appendChild(anchorElt)
 
-        //On ajoute le contenu html ci-dessous à l'intérieur de la balise <a>
-        //to do changer en createElement
-        articleElt.innerHTML =
-            `<article>
-                <img src="${article.imageUrl}" alt="${article.altTxt}"> 
-                <h3 class='productName'> ${article.name} </h3>
-                <p class='productDescription'> ${article.description} </p>
-             </article>`
+        //Création de la balise <article> puis ajout à l'interieur de la balise <a> anchorElt
+        let articleElt = createHtmlElement('article')
+        anchorElt.appendChild(articleElt)
 
-        itemsElt.appendChild(articleElt)
+
+        //On ajoute les contenus html ci-dessous à l'intérieur de la balise <article> articleElt
+
+        // l'image
+        let imgElt = createHtmlElement('img', {
+            src: `${article.imageUrl}`,
+            alt: `${article.altTxt}`
+        })
+        articleElt.appendChild(imgElt)
+
+        //le h3 avec le nom du produit
+        let h3Elt = createHtmlElement('h3', {
+            class: 'productName',
+        })
+        h3Elt.textContent = `${article.name}`
+        articleElt.appendChild(h3Elt)
+
+        //le paragraphe de description
+        let pElt = createHtmlElement('p', {
+            class: 'productDescription'
+        })
+        pElt.textContent = `${article.description}`
+        articleElt.appendChild(pElt)
 
     }
 
 }
+
+getProducts().then(json => showArticles(json))
+
 
 
 
