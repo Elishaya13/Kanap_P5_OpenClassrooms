@@ -6,7 +6,7 @@ export const apiUrl = "http://localhost:3000/api/products/"
  * 
  * @param {string} tagName 
  * @param {Object} attributes 
- * @returns {HTMLHtmlElement} - return a html element
+ * @returns {HTMLElement} - return a html element
  */
 export function createHtmlElement(tagName, attributes = {}) {
     const element = document.createElement(tagName)

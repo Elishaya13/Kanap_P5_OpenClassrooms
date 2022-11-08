@@ -63,77 +63,46 @@ const displayAProduct = (product, fecthProductJson) => {
 
 
     //<article>
-    const articleElt = createHtmlElement('article', {
+    const articleElt = generateHtmlNode('article', sectionParentElt, {
         class: "cart_item",
         "data-id": `${product.id}`,
-        "data-color": `${product.color}`,
+        "data-color": `${product.color}`
     })
-    sectionParentElt.appendChild(articleElt)
+
 
     //<article> > <div cart_item_img>
-    const divCartImgElt = createHtmlElement('div', {
-        class: "cart__item__img"
-    })
-    articleElt.appendChild(divCartImgElt)
-
-    // to do recuperer le json global pour src alt rapport a l'id
-    //recupere listProducts(json) cherche l'index ou se trouve l'id actuel , puis json[indextrouve].imageUrl / .altTxt, 
-
+    const divCartImgElt = generateHtmlNode('div', articleElt, { class: "cart__item__img" })
 
     //<article> > <div cart_item_img> > <img>
-    const imgCartImgElt = createHtmlElement('img', {
+    generateHtmlNode('img', divCartImgElt, {
         src: `${fecthProductJson.imageUrl}`,
         alt: "Photographie d'un canapé"
     })
-    divCartImgElt.appendChild(imgCartImgElt)
+
 
     //<article> > <div cart_item_content>
-    const divContent = createHtmlElement('div', {
-        class: "cart__item__content"
-    })
-    articleElt.appendChild(divContent)
+    const divContent = generateHtmlNode('div', articleElt, { class: "cart__item__content" })
+
 
     //<article> > <div cart_item_content> > <div cart_content_item_description>
-    const divContentDescription = createHtmlElement('div', {
-        class: "cart__item__content__description"
-    })
-    divContent.appendChild(divContentDescription)
+    const divContentDescription = generateHtmlNode('div', divContent, { class: "cart__item__content__description" })
 
     //<article> > <div cart_item_content> > <div_cart_item_description> > <h2> + <p> + <p>
-    const H2Description = createHtmlElement('h2')
-    const pDescriptionColor = createHtmlElement('p')
-    const pDescriptionPrice = createHtmlElement('p')
-    divContentDescription.appendChild(H2Description)
-    divContentDescription.appendChild(pDescriptionColor)
-    divContentDescription.appendChild(pDescriptionPrice)
+    generateHtmlNode('h2', divContentDescription, {})
+    generateHtmlNode('p', divContentDescription, {})
+    generateHtmlNode('p', divContentDescription, {})
 
     //<article> > <div cart_item_content> > <div cart_item_settings>
-    const divContentSettings = createHtmlElement('div', {
-        class: "cart__item__content__settings"
-    })
-    divContent.appendChild(divContentSettings)
+    const divContentSettings = generateHtmlNode('div', divContent, { class: "cart__item__content__settings" })
+
 
     //<div cart_item_content> > <div cart_item_settings> > <div cart_item_settings_quantity>
-    const divContentSettingsQty = createHtmlElement('div', {
-        class: "cart__item__content__settings__quantity"
-    })
-    divContentSettings.appendChild(divContentSettingsQty)
-
+    const divContentSettingsQty = generateHtmlNode('div', divContentSettings, { class: "cart__item__content__settings__quantity" })
 
     //<div cart_item_settings_quantity> > <p> + <input>
-    const pSettingsQty = createHtmlElement('p')
-    pSettingsQty.textContent = `Qté : `
-    divContentSettingsQty.appendChild(pSettingsQty)
 
-    // const inputSettingsQty = createHtmlElement('input', {
-    // type: "number",
-    // class: "itemQuantity",
-    // name: "itemQuantity",
-    // min: "1",
-    // max: "100",
-    // value: `${product.quantity}`,
-    // })
-    // divContentSettingsQty.appendChild(inputSettingsQty)
+    const pSettingsQty = generateHtmlNode('p', divContentSettingsQty, {})
+    pSettingsQty.textContent = `Qté : `
 
     generateHtmlNode(
         'input',
@@ -148,17 +117,13 @@ const displayAProduct = (product, fecthProductJson) => {
         })
 
     //<div cart_item_settings> > <div cart_item_settings_delete>
-    const divContentSettingsDelete = createHtmlElement('div', {
-        class: "cart__item__content__settings__delete"
-    })
-    divContentSettings.appendChild(divContentSettingsDelete)
+    const divContentSettingsDelete = generateHtmlNode('div', divContentSettings, { class: "cart__item__content__settings__delete" })
+
 
     //div cart_item_settings_delete> > <p>
-    const pSettingsDelete = createHtmlElement('p', {
-        class: "deleteItem"
-    })
+    const pSettingsDelete = generateHtmlNode('p', divContentSettingsDelete, { class: "deleteItem" })
     pSettingsDelete.textContent = "Supprimer"
-    divContentSettingsDelete.appendChild(pSettingsDelete)
+
 }
 
 
@@ -169,7 +134,7 @@ showDetailsCart(productsInCart)
 
 const generateHtmlNode = (nodeType, parentElement, attributeObject) => {
     const childElement = createHtmlElement(nodeType, attributeObject)
-    parentElement.appendChild(childElement)
+    return parentElement.appendChild(childElement)
 }
 //     nameChild = createHtmlElement(typeElt, {})
 //     nameParent.appendChild(nameChild)
