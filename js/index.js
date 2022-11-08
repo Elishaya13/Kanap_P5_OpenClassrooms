@@ -15,8 +15,6 @@ const getProducts = async () => {
 
 
 
-
-
 /**
  * Loop on json object and write html content
  * @param {JSON} articles
@@ -41,21 +39,21 @@ const showArticles = (articles) => {
 
         //On ajoute les contenus html ci-dessous à l'intérieur de la balise <article> articleElt
 
-        // l'image
+
         let imgElt = createHtmlElement('img', {
             src: `${article.imageUrl}`,
             alt: `${article.altTxt}`
         })
         articleElt.appendChild(imgElt)
 
-        //le h3 avec le nom du produit
+
         let h3Elt = createHtmlElement('h3', {
             class: 'productName',
         })
         h3Elt.textContent = `${article.name}`
         articleElt.appendChild(h3Elt)
 
-        //le paragraphe de description
+
         let pElt = createHtmlElement('p', {
             class: 'productDescription'
         })
