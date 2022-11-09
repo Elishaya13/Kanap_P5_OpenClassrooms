@@ -118,6 +118,10 @@ const saveCart = (cart) => {
 }
 
 // Recupere les données sauvegardées dans le localStorage (string) et les retourne sous forme de Json/Objet
+/**
+ * 
+ * @returns {JSON}
+ */
 const getCart = () => {
 
     let cart = localStorage.getItem("cart")
@@ -171,7 +175,7 @@ const addCart = () => {
 }
 
 
-// Ajout d'un evenement sur le bouton Ajouter au panier
+// Ajout d'un evenement sur le clic du bouton Ajouter au panier
 document.getElementById("addToCart")
     .addEventListener("click", addCart)
 

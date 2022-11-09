@@ -1,17 +1,17 @@
 import { apiUrl } from "./common.js"
-import { createHtmlElement } from "./common.js"
 
 
 
-/**
- * 
- * @returns {Promise<JSON>} Promise object represents the Json of the API
- */
-const getProducts = async () => {
-    let r = await fetch(apiUrl)
-    let json = await r.json()
-    return json
-}
+
+// /**
+//  * 
+//  * @returns {Promise<JSON>} Promise object represents the Json of the API
+//  */
+// const getProducts = async () => {
+//     let r = await fetch(apiUrl)
+//     let json = await r.json()
+//     return json
+// }
 
 
 
@@ -34,10 +34,16 @@ const getCart = () => {
 
 const fetchProduct = async (productId) => {
     const r = await fetch(apiUrl + productId)
-
     let jsonProduct = await r.json()
-    //console.log(jsonProduct.imageUrl)
     return jsonProduct
+}
+const sortProducts = () => {
+    productsInCart.sort(function (a, b) {
+        if (a.id < b.id)
+            return -1
+        if (a.id > b.id)
+            return 1
+    })
 }
 
 
@@ -45,143 +51,70 @@ const fetchProduct = async (productId) => {
 /**
  * @param {JSON} products // Json recuperer de getCart()
  */
-const showDetailsCart = (productsInCart) => {
+const showDetailsCart = async (productsInCart) => {
 
-    //pour chaque produit creer un contenu html
+    let displayHtmlProduct = ''
+
+    // Pour chaque produit intérroge les données de l'API puis créer un contenu html
     for (let product of productsInCart) {
 
-        fetchProduct(product.id).then(fetchProductJson => {
-            displayAProduct(product, fetchProductJson)
+        await fetchProduct(product.id).then(fetchProductJson => {
+            displayHtmlProduct += displayAProduct(product, fetchProductJson)
 
         })
+
     }
+    // Insère le contenu HTML dans le parent
+    document.getElementById('cart__items').insertAdjacentHTML("beforeend", displayHtmlProduct)
+
+    // document.querySelectorAll('.itemQuantity').forEach(item => {
+    //     item.addEventListener('change', (item) => updateCart(item))
+    // })
+
+
+}
+// const updateCart = (item) => {
+//     let currentElt = item.closest("article");
+//     console.log(currentElt.getAttribute('data-id'))
+// }
+
+/**
+ * Use 
+ * @param {JSON} product 
+ * @param {JSON} fetchProductJson 
+ * @returns {string}
+ */
+const displayAProduct = (product, fetchProductJson) => {
+    let productElt =
+        `
+             <article class="cart__item" data-id="${product.id}" data-color="${product.color}">
+                <div class="cart__item__img">
+                  <img src="${fetchProductJson.imageUrl}" alt="${fetchProductJson.altTxt}">
+                </div>
+                <div class="cart__item__content">
+                  <div class="cart__item__content__description">
+                    <h2>${fetchProductJson.name}</h2>
+                    <p>${product.color}</p>
+                    <p>${fetchProductJson.price} €</p>
+                  </div>
+                  <div class="cart__item__content__settings">
+                    <div class="cart__item__content__settings__quantity">
+                      <p>Qté : </p>
+                      <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${product.quantity}">
+                    </div>
+                    <div class="cart__item__content__settings__delete">
+                      <p class="deleteItem">Supprimer</p>
+                    </div>
+                  </div>
+                </div>
+              </article>
+         `
+    return productElt
 }
 
 
-const displayAProduct = (product, fecthProductJson) => {
-    const sectionParentElt = document.getElementById('cart__items')
-
-
-    //<article>
-    const articleElt = generateHtmlNode('article', sectionParentElt, {
-        class: "cart_item",
-        "data-id": `${product.id}`,
-        "data-color": `${product.color}`
-    })
-
-
-    //<article> > <div cart_item_img>
-    const divCartImgElt = generateHtmlNode('div', articleElt, { class: "cart__item__img" })
-
-    //<article> > <div cart_item_img> > <img>
-    generateHtmlNode('img', divCartImgElt, {
-        src: `${fecthProductJson.imageUrl}`,
-        alt: "Photographie d'un canapé"
-    })
-
-
-    //<article> > <div cart_item_content>
-    const divContent = generateHtmlNode('div', articleElt, { class: "cart__item__content" })
-
-
-    //<article> > <div cart_item_content> > <div cart_content_item_description>
-    const divContentDescription = generateHtmlNode('div', divContent, { class: "cart__item__content__description" })
-
-    //<article> > <div cart_item_content> > <div_cart_item_description> > <h2> + <p> + <p>
-    generateHtmlNode('h2', divContentDescription, {})
-    generateHtmlNode('p', divContentDescription, {})
-    generateHtmlNode('p', divContentDescription, {})
-
-    //<article> > <div cart_item_content> > <div cart_item_settings>
-    const divContentSettings = generateHtmlNode('div', divContent, { class: "cart__item__content__settings" })
-
-
-    //<div cart_item_content> > <div cart_item_settings> > <div cart_item_settings_quantity>
-    const divContentSettingsQty = generateHtmlNode('div', divContentSettings, { class: "cart__item__content__settings__quantity" })
-
-    //<div cart_item_settings_quantity> > <p> + <input>
-
-    const pSettingsQty = generateHtmlNode('p', divContentSettingsQty, {})
-    pSettingsQty.textContent = `Qté : `
-
-    generateHtmlNode(
-        'input',
-        divContentSettingsQty,
-        {
-            type: "number",
-            class: "itemQuantity",
-            name: "itemQuantity",
-            min: "1",
-            max: "100",
-            value: `${product.quantity}`
-        })
-
-    //<div cart_item_settings> > <div cart_item_settings_delete>
-    const divContentSettingsDelete = generateHtmlNode('div', divContentSettings, { class: "cart__item__content__settings__delete" })
-
-
-    //div cart_item_settings_delete> > <p>
-    const pSettingsDelete = generateHtmlNode('p', divContentSettingsDelete, { class: "deleteItem" })
-    pSettingsDelete.textContent = "Supprimer"
-
-}
 
 
 const productsInCart = getCart()
-showDetailsCart(productsInCart)
+showDetailsCart(productsInCart), sortProducts()
 
-
-
-const generateHtmlNode = (nodeType, parentElement, attributeObject) => {
-    const childElement = createHtmlElement(nodeType, attributeObject)
-    return parentElement.appendChild(childElement)
-}
-//     nameChild = createHtmlElement(typeElt, {})
-//     nameParent.appendChild(nameChild)
-
-// }
-
-
-
-
-
-// function removeFromBasket(product) {
-//     let basket = getBasket()
-//     basket = basket.filter(p => p.id != product.id)
-//     saveBasket(basket)
-// }
-
-// function changeQuantity(product, quantity) {
-//     //on recupere le panier qui existe dans le local storage
-//     let basket = getBasket()
-//     //find va retourner undefined s'il ne trouve pas
-//     let foundProduct = basket.find(p => p.id == product.id)
-//     if (foundProduct != undefined) {
-//         foundProduct.quantity += quantity
-//         if (foundProduct.quantity <= 0) {
-//             removeFromBasket(foundProduct)
-//         } else {
-//             saveBasket(basket)
-//         }
-
-//     }
-
-// }
-
-// function getNumberProduct() {
-//     let basket = getBasket()
-//     let number = 0
-//     for (let product of basket) {
-//         number += product.quantity
-//     }
-//     return number
-// }
-
-// function getTotalPrice() {
-//     let basket = getBasket()
-//     let total = 0
-//     for (let product of basket) {
-//         total += product.quantity * product.price
-//     }
-//     return total
-// }
