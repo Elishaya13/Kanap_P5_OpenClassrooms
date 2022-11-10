@@ -11,7 +11,7 @@ const getCart = () => {
     return JSON.parse(cart)
   }
 }
-
+let cart = getCart()
 /**
  * Transforms the data into a string 
  * And saves it in the localStorage
@@ -57,6 +57,24 @@ const showDetailsCart = async (productsInCart) => {
 
   //Ecoute si un changement est fait sur le panier 
   changeCart()
+
+  // deleteItem()
+  //bouton supprimer
+
+  //To do ajouter l'effacement dans le localstorage au clic suppr
+  document.querySelectorAll('.deleteItem').forEach(item => {
+
+    let currentElt = item.closest("article")
+    let currentEltId = currentElt.getAttribute('data-id')
+    let currentEltColor = currentElt.getAttribute('data-color')
+    console.log(currentEltId + currentEltColor)
+    item.addEventListener('click', () => (
+      currentElt.remove()
+    ))
+  })
+
+
+
 }
 
 /**
@@ -126,16 +144,82 @@ const changeCart = () => {
      */
     const changeQuantity = (targetValue) => {
 
-      let cart = getCart()
-
       let foundProduct = cart.find(p => p.id == currentEltId && p.color == currentEltColor)
       if (foundProduct != undefined) {
+
         foundProduct.quantity = targetValue
-        saveCart(cart)
+
+        if (foundProduct.quantity <= 0) {
+          //retourn l'index 
+          let foundIndex = cart.indexOf(foundProduct)
+          cart.splice(foundIndex, 1)
+          //puis lancer la fonction deleteItem lorsqu'elle sera créée
+          currentElt.remove()
+        }
       }
+      saveCart(cart)
     }
+
   })
 }
+
+
+
+
+
+
+// const removeFromCart = (item) => {
+
+//   let foundProduct = cart.find(p => p.id == currentEltId && p.color == currentEltColor)
+//   if (foundProduct != undefined) {
+//     foundProduct
+//   }
+
+
+
+
+
+
+
+
+
+// const deleteItem = () => {
+//   document.querySelectorAll('.deleteItem').forEach(item => {
+//     let currentElt = item.closest("article");
+//     let currentEltId = currentElt.getAttribute('data-id')
+//     let currentEltColor = currentElt.getAttribute('data-color')
+
+//     //let foundProduct = cart.find(p => p.id == currentEltId && p.color == currentEltColor)
+
+//     item.addEventListener('click', () => {
+
+
+//       let foundProduct = cart.find(p => p.id == currentEltId && p.color == currentEltColor)
+//       if (foundProduct != undefined) {
+
+//         let foundIndex = cart.indexOf(foundProduct)
+//         cart.splice(foundIndex, 1)
+//         console.log("supp")
+//       }
+//     })
+//     // saveCart()
+//     //   removeItem(currentElt))
+//     // const removeItem = () => {
+//     // //selectionne l'article complet et supprime son contenu
+//     // }
+//   })
+
+// }
+
+
+
+
+// const deleteItem = () => {
+//   console.log("je supprime")
+//   //localStorage.removeItem('cart', item)
+
+// }
+
 
 const productsInCart = getCart()
 showDetailsCart(productsInCart), sortProducts()
