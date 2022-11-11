@@ -2,6 +2,10 @@ import { apiUrl } from "./common.js"
 
 
 // Recupere les données sauvegardées dans le localStorage (string) et les retourne sous forme de Json/Objet
+/**
+ * 
+ * @returns {{id: String, color: String, quantity: Number}[]} 
+ */
 const getCart = () => {
 
   let cart = localStorage.getItem("cart")
@@ -30,8 +34,6 @@ const fetchProduct = async (productId) => {
   return jsonProduct
 }
 
-
-
 /**
  * Fuction showDetailsCart
  * @param {JSON} productsInCart 
@@ -40,43 +42,35 @@ const fetchProduct = async (productId) => {
 const showDetailsCart = async (productsInCart) => {
 
   let displayHtmlProduct = ''
+  let lastProductId
+  let fetchProductJson
 
   // Boucle sur chaque produit et intérroge les données de l'API
   // Puis créer un contenu html
-  for (let product of productsInCart) {
-    await fetchProduct(product.id)
-      .then(fetchProductJson => {
-        displayHtmlProduct += displayAProduct(product, fetchProductJson)
-      })
-  }
 
+  for (let product of productsInCart) {
+
+    if (product.id != lastProductId) {
+      lastProductId = product.id
+      fetchProductJson = await fetchProduct(product.id)
+    }
+
+    displayHtmlProduct += displayAProduct(product, fetchProductJson)
+  }
   // Insère le contenu HTML dans le parent
   document
     .getElementById('cart__items')
     .insertAdjacentHTML("beforeend", displayHtmlProduct)
-
-  //Ecoute si un changement est fait sur le panier 
-  changeCart()
-
-  // deleteItem()
-  //bouton supprimer
-
-  //To do ajouter l'effacement dans le localstorage au clic suppr
-  document.querySelectorAll('.deleteItem').forEach(item => {
-
-    let currentElt = item.closest("article")
-    let currentEltId = currentElt.getAttribute('data-id')
-    let currentEltColor = currentElt.getAttribute('data-color')
-    console.log(currentEltId + currentEltColor)
-    item.addEventListener('click', () => (
-      currentElt.remove()
-    ))
-  })
-
-
+  // Eventlistener sur les inputs de quantité
+  document.querySelectorAll('.itemQuantity').forEach(inputQty =>
+    inputQty.addEventListener('change', (e) => updateCart(inputQty, e.target.value))
+  )
+  //Eventlistener sur les boutons 'Supprimer'
+  document.querySelectorAll('.deleteItem').forEach(buttonSuppr =>
+    buttonSuppr.addEventListener('click', () => (updateCart(buttonSuppr, 0)))
+  )
 
 }
-
 /**
  * Use 
  * @param {JSON} product 
@@ -119,108 +113,32 @@ const sortProducts = () => {
       return -1
     if (a.id > b.id)
       return 1
+    if (a.id === b.id)
+      return 0
   })
 }
+
 
 /**
- * Update cart with new values of product quantity
+ * @param {number} targetValue
+ 
+ * Parcours l'actuel panier, modifie la quantité par la nouvelle valeur saisie
  */
-const changeCart = () => {
+const updateCart = (domElt, targetValue) => {
+  // Cible le parent et recupère l'information id et color dans ses attributs
+  let currentElt = domElt.closest("article")
+  let currentEltId = currentElt.getAttribute('data-id')
+  let currentEltColor = currentElt.getAttribute('data-color')
+  let foundProduct = cart.find(p => p.id == currentEltId && p.color == currentEltColor)
 
-  // Selectionne tous les inputs de quantité
-  document.querySelectorAll('.itemQuantity').forEach(item => {
+  foundProduct.quantity = targetValue
 
-    // Cible le parent et recupère l'information id et color dans ses attributs
-    let currentElt = item.closest("article");
-    let currentEltId = currentElt.getAttribute('data-id')
-    let currentEltColor = currentElt.getAttribute('data-color')
-
-    // Ajoute un evenement d'ecoute au changement de valeur de l'input
-    item.addEventListener('change', (e) => changeQuantity(e.target.value))
-
-    /**
-     * @param {number} targetValue
-     * Parcours l'actuel panier, modifie la quantité par la nouvelle valeur saisie
-     */
-    const changeQuantity = (targetValue) => {
-
-      let foundProduct = cart.find(p => p.id == currentEltId && p.color == currentEltColor)
-      if (foundProduct != undefined) {
-
-        foundProduct.quantity = targetValue
-
-        if (foundProduct.quantity <= 0) {
-          //retourn l'index 
-          let foundIndex = cart.indexOf(foundProduct)
-          cart.splice(foundIndex, 1)
-          //puis lancer la fonction deleteItem lorsqu'elle sera créée
-          currentElt.remove()
-        }
-      }
-      saveCart(cart)
-    }
-
-  })
+  if (foundProduct.quantity <= 0) {
+    cart.splice(cart.indexOf(foundProduct), 1)
+    currentElt.remove()
+  }
+  saveCart(cart)
 }
 
-
-
-
-
-
-// const removeFromCart = (item) => {
-
-//   let foundProduct = cart.find(p => p.id == currentEltId && p.color == currentEltColor)
-//   if (foundProduct != undefined) {
-//     foundProduct
-//   }
-
-
-
-
-
-
-
-
-
-// const deleteItem = () => {
-//   document.querySelectorAll('.deleteItem').forEach(item => {
-//     let currentElt = item.closest("article");
-//     let currentEltId = currentElt.getAttribute('data-id')
-//     let currentEltColor = currentElt.getAttribute('data-color')
-
-//     //let foundProduct = cart.find(p => p.id == currentEltId && p.color == currentEltColor)
-
-//     item.addEventListener('click', () => {
-
-
-//       let foundProduct = cart.find(p => p.id == currentEltId && p.color == currentEltColor)
-//       if (foundProduct != undefined) {
-
-//         let foundIndex = cart.indexOf(foundProduct)
-//         cart.splice(foundIndex, 1)
-//         console.log("supp")
-//       }
-//     })
-//     // saveCart()
-//     //   removeItem(currentElt))
-//     // const removeItem = () => {
-//     // //selectionne l'article complet et supprime son contenu
-//     // }
-//   })
-
-// }
-
-
-
-
-// const deleteItem = () => {
-//   console.log("je supprime")
-//   //localStorage.removeItem('cart', item)
-
-// }
-
-
 const productsInCart = getCart()
-showDetailsCart(productsInCart), sortProducts()
-
+showDetailsCart(productsInCart.sort(sortProducts()))
