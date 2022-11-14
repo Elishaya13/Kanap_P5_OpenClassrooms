@@ -1,5 +1,7 @@
 import { apiUrl } from "./common.js"
 
+/** Affichage du panier et total */
+
 /**
  * Retrieves the data saved in the localStorage and returns them in a JSON/Object
  * @returns {{id: String, color: String, quantity: String}[]} 
@@ -13,14 +15,12 @@ const getCart = () => {
     return JSON.parse(cart)
   }
 }
-let cart = getCart()
 
 /**
  * Transforms the data into a string and saves it in the localStorage
  * @param {JSON} cart 
  */
-const saveCart = (cart) => {
-
+const saveCart = () => {
   localStorage.setItem("cart", JSON.stringify(cart))
 }
 
@@ -32,8 +32,7 @@ const saveCart = (cart) => {
 const fetchProduct = async (productId) => {
 
   const r = await fetch(apiUrl + productId)
-  let jsonProduct = await r.json()
-  return jsonProduct
+  return await r.json()
 }
 
 /**
@@ -41,7 +40,7 @@ const fetchProduct = async (productId) => {
  * @param {JSON} productsInCart 
  * 
  */
-const showDetailsCart = async (productsInCart) => {
+const displayCart = async (productsInCart) => {
 
   let displayHtmlProduct = ''
   let lastProductId
@@ -58,18 +57,16 @@ const showDetailsCart = async (productsInCart) => {
     }
     displayHtmlProduct += displayAProduct(product, fetchProductJson)
   }
+
   // Add the HTML content in parent element
   document
     .getElementById('cart__items')
     .insertAdjacentHTML("beforeend", displayHtmlProduct)
 
-
   // Add the listeners for input and delete elements
-  listeners()
-
-
-
-
+  //setListeners()
+  getTotalPrice()
+  getTotalQuantity()
 }
 
 /**
@@ -124,7 +121,7 @@ const sortProducts = () => {
 /**
  * Add a eventListener on the change, on the quantity input element and the delete button element
  */
-const listeners = () => {
+const setListeners = async () => {
   // Eventlistener on the quantity input
   document.querySelectorAll('.itemQuantity').forEach(inputQty =>
     inputQty.addEventListener('change', (e) => updateCart(inputQty, e.target.value))
@@ -133,11 +130,7 @@ const listeners = () => {
   document.querySelectorAll('.deleteItem').forEach(buttonSuppr =>
     buttonSuppr.addEventListener('click', () => (updateCart(buttonSuppr, 0)))
   )
-
-  document.querySelector('#totalQuantity').textContent = `${getTotalQuantity(cart)}`
-
-
-
+  document.getElementById('order').addEventListener('click', postForm)
 }
 
 /**
@@ -160,34 +153,56 @@ const updateCart = (domElt, targetValue) => {
     cart.splice(cart.indexOf(foundProduct), 1)
     currentElt.remove()
   }
-  document.querySelector('#totalQuantity').textContent = `${getTotalQuantity(cart)}`
-
+  getTotalQuantity()
+  getTotalPrice()
 
   // Save it to the localStorage
-  saveCart(cart)
+  saveCart()
 }
-
-
-//****** Total and Price ********/
-
 
 /**
  * Calculate the total number of items
- * @param {JSON} cart 
  * @returns {number}
  */
-const getTotalQuantity = (cart) => {
+const getTotalQuantity = () => {
   let quantityCart = []
   for (let product of cart) {
     quantityCart.push(parseInt(product.quantity))
   }
   quantityCart = quantityCart.reduce((a, b) => a + b, 0)
-  return quantityCart
+  document.getElementById('totalQuantity').textContent = quantityCart
 }
 
+/**
+ * Calculte the total price of the items 
+ * @returns {number}
+ */
+const getTotalPrice = async () => {
+  let lastProductId
+  let fetchProductJson
+  let productPrice = 0
+  for (let product of cart) {
 
+    if (product.id != lastProductId) {
 
+      lastProductId = product.id
+      fetchProductJson = await fetchProduct(product.id)
+    }
+    productPrice += product.quantity * fetchProductJson.price
+
+  }
+
+  document.getElementById('totalPrice').textContent = productPrice
+
+}
+
+/** Gestion du formulaire **/
+const postForm = () => { console.log("coucou") }
 
 /** Application **/
-showDetailsCart(cart.sort(sortProducts()))
+let cart = getCart()
+await displayCart(cart.sort(sortProducts()))
+await setListeners()
+
+
 

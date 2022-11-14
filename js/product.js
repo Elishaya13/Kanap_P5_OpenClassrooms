@@ -9,14 +9,13 @@ const idProduct = url.searchParams.get('id')
 
 const currentIdProduct = idProduct
 
-
+//To do export avec getProductId
 /**
  * @returns {Promise<JSON>} Promise object represents the Json of the API
  */
 const getProduct = async () => {
     const r = await fetch(apiUrl + idProduct)
-    let jsonInfo = await r.json()
-    return jsonInfo
+    return await r.json()
 
 }
 
