@@ -1,9 +1,7 @@
 import { apiUrl } from "./common.js"
 
-
-// Recupere les données sauvegardées dans le localStorage (string) et les retourne sous forme de Json/Objet
 /**
- * 
+ * Retrieves the data saved in the localStorage and returns them in a JSON/Object
  * @returns {{id: String, color: String, quantity: Number}[]} 
  */
 const getCart = () => {
@@ -15,10 +13,12 @@ const getCart = () => {
     return JSON.parse(cart)
   }
 }
+
 let cart = getCart()
+
+
 /**
- * Transforms the data into a string 
- * And saves it in the localStorage
+ * Transforms the data into a string and saves it in the localStorage
  * @param {JSON} cart 
  */
 const saveCart = (cart) => {
@@ -26,7 +26,12 @@ const saveCart = (cart) => {
   localStorage.setItem("cart", JSON.stringify(cart))
 }
 
-// Intérroge l'API du produit et récupere le Json
+
+/**
+ * Query the product API and return the data from the URL in a JSON
+ * @param {string} productId 
+ * @returns {JSON}
+ */
 const fetchProduct = async (productId) => {
 
   const r = await fetch(apiUrl + productId)
@@ -35,7 +40,7 @@ const fetchProduct = async (productId) => {
 }
 
 /**
- * Fuction showDetailsCart
+ * Display each product from the cart and listen for the quantity change
  * @param {JSON} productsInCart 
  * 
  */
@@ -45,37 +50,32 @@ const showDetailsCart = async (productsInCart) => {
   let lastProductId
   let fetchProductJson
 
-  // Boucle sur chaque produit et intérroge les données de l'API
-  // Puis créer un contenu html
-
+  // Loop on each product , keep the data from API and "id" data and store them in a variables
+  // If the "id" is the same, do not query the API again
+  // Add the "string" HTML content created using the data
   for (let product of productsInCart) {
 
     if (product.id != lastProductId) {
       lastProductId = product.id
       fetchProductJson = await fetchProduct(product.id)
     }
-
     displayHtmlProduct += displayAProduct(product, fetchProductJson)
   }
-  // Insère le contenu HTML dans le parent
+  // Add the HTML content in parent element
   document
     .getElementById('cart__items')
     .insertAdjacentHTML("beforeend", displayHtmlProduct)
-  // Eventlistener sur les inputs de quantité
-  document.querySelectorAll('.itemQuantity').forEach(inputQty =>
-    inputQty.addEventListener('change', (e) => updateCart(inputQty, e.target.value))
-  )
-  //Eventlistener sur les boutons 'Supprimer'
-  document.querySelectorAll('.deleteItem').forEach(buttonSuppr =>
-    buttonSuppr.addEventListener('click', () => (updateCart(buttonSuppr, 0)))
-  )
+
+  // Add the listeners for input and delete elements
+  listeners()
 
 }
+
 /**
- * Use 
+ * Create the DOM elements for the product with the Json data
  * @param {JSON} product 
  * @param {JSON} fetchProductJson 
- * @returns {string}
+ * @returns {String} -string
  */
 const displayAProduct = (product, fetchProductJson) => {
   let productElt =
@@ -105,7 +105,10 @@ const displayAProduct = (product, fetchProductJson) => {
   return productElt
 }
 
-//Trie les produits par Id
+
+/**
+ * Sort products by ID
+ */
 const sortProducts = () => {
 
   productsInCart.sort(function (a, b) {
@@ -118,25 +121,42 @@ const sortProducts = () => {
   })
 }
 
+/**
+ * Add a eventListener on the change, on the quantity input element and the delete button element
+ */
+const listeners = () => {
+  // Eventlistener on the quantity input
+  document.querySelectorAll('.itemQuantity').forEach(inputQty =>
+    inputQty.addEventListener('change', (e) => updateCart(inputQty, e.target.value))
+  )
+  // Eventlistener on the button "supprimer"
+  document.querySelectorAll('.deleteItem').forEach(buttonSuppr =>
+    buttonSuppr.addEventListener('click', () => (updateCart(buttonSuppr, 0)))
+  )
+
+}
 
 /**
+ * Browse the current basket, modify the quantity by the new value entered or delete the product
  * @param {number} targetValue
- 
- * Parcours l'actuel panier, modifie la quantité par la nouvelle valeur saisie
  */
 const updateCart = (domElt, targetValue) => {
-  // Cible le parent et recupère l'information id et color dans ses attributs
+
+  // Targets the parent element and retrieves the "id" and "color" information in its attributes
   let currentElt = domElt.closest("article")
   let currentEltId = currentElt.getAttribute('data-id')
   let currentEltColor = currentElt.getAttribute('data-color')
-  let foundProduct = cart.find(p => p.id == currentEltId && p.color == currentEltColor)
 
+  // Find the current product from the cart
+  let foundProduct = cart.find(product => product.id == currentEltId && product.color == currentEltColor)
   foundProduct.quantity = targetValue
 
+  // Remove the product from the cart and the DOM
   if (foundProduct.quantity <= 0) {
     cart.splice(cart.indexOf(foundProduct), 1)
     currentElt.remove()
   }
+  // Save it to the localStorage
   saveCart(cart)
 }
 
