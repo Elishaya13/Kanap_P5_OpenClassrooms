@@ -2,7 +2,7 @@ import { apiUrl } from "./common.js"
 
 /**
  * Retrieves the data saved in the localStorage and returns them in a JSON/Object
- * @returns {{id: String, color: String, quantity: Number}[]} 
+ * @returns {{id: String, color: String, quantity: String}[]} 
  */
 const getCart = () => {
 
@@ -13,9 +13,7 @@ const getCart = () => {
     return JSON.parse(cart)
   }
 }
-
 let cart = getCart()
-
 
 /**
  * Transforms the data into a string and saves it in the localStorage
@@ -25,7 +23,6 @@ const saveCart = (cart) => {
 
   localStorage.setItem("cart", JSON.stringify(cart))
 }
-
 
 /**
  * Query the product API and return the data from the URL in a JSON
@@ -66,8 +63,12 @@ const showDetailsCart = async (productsInCart) => {
     .getElementById('cart__items')
     .insertAdjacentHTML("beforeend", displayHtmlProduct)
 
+
   // Add the listeners for input and delete elements
   listeners()
+
+
+
 
 }
 
@@ -105,13 +106,12 @@ const displayAProduct = (product, fetchProductJson) => {
   return productElt
 }
 
-
 /**
  * Sort products by ID
  */
 const sortProducts = () => {
 
-  productsInCart.sort(function (a, b) {
+  cart.sort(function (a, b) {
     if (a.id < b.id)
       return -1
     if (a.id > b.id)
@@ -133,6 +133,10 @@ const listeners = () => {
   document.querySelectorAll('.deleteItem').forEach(buttonSuppr =>
     buttonSuppr.addEventListener('click', () => (updateCart(buttonSuppr, 0)))
   )
+
+  document.querySelector('#totalQuantity').textContent = `${getTotalQuantity(cart)}`
+
+
 
 }
 
@@ -156,9 +160,34 @@ const updateCart = (domElt, targetValue) => {
     cart.splice(cart.indexOf(foundProduct), 1)
     currentElt.remove()
   }
+  document.querySelector('#totalQuantity').textContent = `${getTotalQuantity(cart)}`
+
+
   // Save it to the localStorage
   saveCart(cart)
 }
 
-const productsInCart = getCart()
-showDetailsCart(productsInCart.sort(sortProducts()))
+
+//****** Total and Price ********/
+
+
+/**
+ * Calculate the total number of items
+ * @param {JSON} cart 
+ * @returns {number}
+ */
+const getTotalQuantity = (cart) => {
+  let quantityCart = []
+  for (let product of cart) {
+    quantityCart.push(parseInt(product.quantity))
+  }
+  quantityCart = quantityCart.reduce((a, b) => a + b, 0)
+  return quantityCart
+}
+
+
+
+
+/** Application **/
+showDetailsCart(cart.sort(sortProducts()))
+
