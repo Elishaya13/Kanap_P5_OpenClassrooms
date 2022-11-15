@@ -65,8 +65,35 @@ const displayCart = async (productsInCart) => {
 
   // Add the listeners for input and delete elements
   //setListeners()
-  getTotalPrice()
-  getTotalQuantity()
+  setTotalPrice()
+  setTotalQuantity()
+}
+
+/**
+ * Browse the current basket, modify the quantity by the new value entered or delete the product
+ * @param {number} targetValue
+ */
+const updateCart = (domElt, targetValue) => {
+
+  // Targets the parent element and retrieves the "id" and "color" information in its attributes
+  let currentElt = domElt.closest("article")
+  let currentEltId = currentElt.getAttribute('data-id')
+  let currentEltColor = currentElt.getAttribute('data-color')
+
+  // Find the current product from the cart
+  let foundProduct = cart.find(product => product.id == currentEltId && product.color == currentEltColor)
+  foundProduct.quantity = targetValue
+
+  // Remove the product from the cart and the DOM
+  if (foundProduct.quantity <= 0) {
+    cart.splice(cart.indexOf(foundProduct), 1)
+    currentElt.remove()
+  }
+  setTotalQuantity()
+  setTotalPrice()
+
+  // Save it to the localStorage
+  saveCart()
 }
 
 /**
@@ -118,53 +145,12 @@ const sortProducts = () => {
   })
 }
 
-/**
- * Add a eventListener on the change, on the quantity input element and the delete button element
- */
-const setListeners = async () => {
-  // Eventlistener on the quantity input
-  document.querySelectorAll('.itemQuantity').forEach(inputQty =>
-    inputQty.addEventListener('change', (e) => updateCart(inputQty, e.target.value))
-  )
-  // Eventlistener on the button "supprimer"
-  document.querySelectorAll('.deleteItem').forEach(buttonSuppr =>
-    buttonSuppr.addEventListener('click', () => (updateCart(buttonSuppr, 0)))
-  )
-  document.getElementById('order').addEventListener('click', postForm)
-}
-
-/**
- * Browse the current basket, modify the quantity by the new value entered or delete the product
- * @param {number} targetValue
- */
-const updateCart = (domElt, targetValue) => {
-
-  // Targets the parent element and retrieves the "id" and "color" information in its attributes
-  let currentElt = domElt.closest("article")
-  let currentEltId = currentElt.getAttribute('data-id')
-  let currentEltColor = currentElt.getAttribute('data-color')
-
-  // Find the current product from the cart
-  let foundProduct = cart.find(product => product.id == currentEltId && product.color == currentEltColor)
-  foundProduct.quantity = targetValue
-
-  // Remove the product from the cart and the DOM
-  if (foundProduct.quantity <= 0) {
-    cart.splice(cart.indexOf(foundProduct), 1)
-    currentElt.remove()
-  }
-  getTotalQuantity()
-  getTotalPrice()
-
-  // Save it to the localStorage
-  saveCart()
-}
 
 /**
  * Calculate the total number of items
  * @returns {number}
  */
-const getTotalQuantity = () => {
+const setTotalQuantity = () => {
   let quantityCart = []
   for (let product of cart) {
     quantityCart.push(parseInt(product.quantity))
@@ -177,7 +163,7 @@ const getTotalQuantity = () => {
  * Calculte the total price of the items 
  * @returns {number}
  */
-const getTotalPrice = async () => {
+const setTotalPrice = async () => {
   let lastProductId
   let fetchProductJson
   let productPrice = 0
@@ -196,13 +182,90 @@ const getTotalPrice = async () => {
 
 }
 
+/**
+ * Add a eventListener on the change, on the quantity input element and the delete button element
+ */
+const setListeners = async () => {
+  // Eventlistener on the quantity input
+  document.querySelectorAll('.itemQuantity').forEach(inputQty =>
+    inputQty.addEventListener('change', (e) => updateCart(inputQty, e.target.value))
+  )
+  // Eventlistener on the button "supprimer"
+  document.querySelectorAll('.deleteItem').forEach(buttonSuppr =>
+    buttonSuppr.addEventListener('click', () => (updateCart(buttonSuppr, 0)))
+  )
+  document.getElementById('order').addEventListener('click', postForm)
+}
+
 /** Gestion du formulaire **/
-const postForm = () => { console.log("coucou") }
+
+
+
+
+/** Templates des fonctions*/
+
+
+const checkIfValid = (eltId) => {
+
+
+  let inputElt = document.getElementById(eltId) // input prenom
+  let errorMsgElt = document.getElementById(eltId + "ErrorMsg")
+  let inputValidRegex = /^[a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+([-'\s][a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+)?$/ //Regex verification format du prenon, nom et ville
+  let inputValidRegexEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/ // Regex pour l'email 
+
+
+  if (inputElt.validity.valueMissing) {
+    errorMsgElt.textContent = "Le champ ne doit pas être vide"
+    errorMsgElt.style.color = "red"
+    return false
+  }
+
+  if (eltId == "email" && !inputValidRegexEmail.test(inputElt.value)) {
+
+    errorMsgElt.textContent = "Le champ doit contenir un email valide"
+    errorMsgElt.style.color = "yellow"
+    return false
+  }
+
+  //to do gerer l'adresse regex
+
+  if (eltId !== "email" && !inputValidRegex.test(inputElt.value)) {
+    console.log("default")
+    errorMsgElt.textContent = "Le champ doit contenir un minimum de 2 caractères et ne pas contenir de chiffres"
+    errorMsgElt.style.color = "orange"
+    return false
+
+  } else {
+    console.log("ko")
+
+    errorMsgElt.textContent = ''
+    return true
+  }
+
+
+}
+
+
+
+/** Fonction formulaire main */
+const postForm = (e) => {
+
+  let formIds = ['firstName', 'lastName', 'address', 'city', 'email']
+  let results = formIds.map(id => checkIfValid(id))
+
+
+  // if (!results.includes(false)) {
+  //   console.log("je poste mon formulaire")
+  // } else {
+  //   e.preventDefault()
+  // }
+  // On post le formulaire s'il ne contient aucune erreur sinon on annule son comportement par defaut 
+  !results.includes(false) ? console.log("je poste mon formulaire") : e.preventDefault()
+
+}
 
 /** Application **/
+
 let cart = getCart()
 await displayCart(cart.sort(sortProducts()))
 await setListeners()
-
-
-
