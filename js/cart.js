@@ -208,10 +208,12 @@ const setListeners = async () => {
 const checkIfValid = (eltId) => {
 
 
-  let inputElt = document.getElementById(eltId) // input prenom
+  let inputElt = document.getElementById(eltId) // input ID
   let errorMsgElt = document.getElementById(eltId + "ErrorMsg")
-  let inputValidRegex = /^[a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+([-'\s][a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+)?$/ //Regex verification format du prenon, nom et ville
+  let inputValidRegex = /^[a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+([-'\s][a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+)?$/
   let inputValidRegexEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/ // Regex pour l'email 
+  let inputAdressLength = inputElt.value.split(' ').length
+  let inputValidRegexCity = /^([0-9]{5}).[a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+([-'\s][a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+)?$/ //Regex ville ex: 75000 Paris
 
 
   if (inputElt.validity.valueMissing) {
@@ -227,16 +229,24 @@ const checkIfValid = (eltId) => {
     return false
   }
 
-  //to do gerer l'adresse regex
+  if (eltId == "address" && !(inputAdressLength > 2)) {
+    console.log(length)
+    errorMsgElt.textContent = "L'adresse doit contenir minimum 3 mots"
+    errorMsgElt.style.color = "white"
+    return false
+  }
+  if (eltId == "city" && !inputValidRegexCity.test(inputElt.value)) {
+    errorMsgElt.textContent = "Le champ doit contenir le code postal et la ville (ex: 75000 Paris)"
+    errorMsgElt.style.color = "pink"
+    return false
+  }
 
-  if (eltId !== "email" && !inputValidRegex.test(inputElt.value)) {
-    console.log("default")
+  if (eltId !== "email" && eltId !== "address" && eltId !== "city" && !inputValidRegex.test(inputElt.value)) {
     errorMsgElt.textContent = "Le champ doit contenir un minimum de 2 caractères et ne pas contenir de chiffres"
     errorMsgElt.style.color = "orange"
     return false
 
   } else {
-    console.log("ko")
 
     errorMsgElt.textContent = ''
     return true
@@ -260,9 +270,63 @@ const postForm = (e) => {
   //   e.preventDefault()
   // }
   // On post le formulaire s'il ne contient aucune erreur sinon on annule son comportement par defaut 
-  !results.includes(false) ? console.log("je poste mon formulaire") : e.preventDefault()
-
+  !results.includes(false) ? console.log("posté") : e.preventDefault()
 }
+
+//mafonction()
+
+/** POST */
+//fonction push données dans mon tableau objet
+
+// const getDataForm = (id) => {
+//   //let formIds = ['firstName', 'lastName', 'address', 'city', 'email']
+//   // let inputElt = id.map(eltID => document.getElementById(eltID))
+//   // console.log(inputElt.value)
+
+
+//   let formIds = ['firstName', 'lastName', 'address', 'city', 'email']
+//   let resultsValue = formIds.map(eltId => document.getElementById(eltId).value)
+//   let eltId = formIds.map(eltId => document.getElementById(eltId))
+//   console.log(resultsValue)
+//   const values = {
+//     firstName: resultsValue[0],
+//     lastName: resultsValue[1],
+//     address: resultsValue[2],
+//     city: resultsValue[3],
+//     email: resultsValue[4]
+//   }
+//   let contact = new Map(Object.entries(values))
+
+//   console.log(contact)
+//   //pour chaque inputID recupere la valeur saisie et push
+
+
+
+
+
+
+// const mafonction = async () => {
+
+//   let formIds = ['firstName', 'lastName', 'address', 'city', 'email']
+//   let id = formIds.map(id => document.getElementById(id))
+
+//   let response = await fetch(apiUrl + "order", {
+//     method: "POST",
+//     header: {
+//       'Accept': 'application/json',
+//       'Content-Type': 'application/json;charset=utf-8'
+//     },
+//     body: JSON.stringify({
+//       contact: {
+//         firstName: id[0].value,
+//         lastName: id[1].value
+//       }
+//     })
+//   })
+
+//   let resultat = await response.json()
+//   alert(resultat.message)
+// }
 
 /** Application **/
 
