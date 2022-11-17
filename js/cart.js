@@ -1,4 +1,5 @@
 import { apiUrl } from "./common.js"
+import MyCart from "./MyCart.js";
 
 /** Affichage du panier et total */
 
@@ -63,10 +64,8 @@ const displayCart = async (productsInCart) => {
     .getElementById('cart__items')
     .insertAdjacentHTML("beforeend", displayHtmlProduct)
 
-  // Add the listeners for input and delete elements
-  //setListeners()
-  setTotalPrice()
   setTotalQuantity()
+  setTotalPrice()
 }
 
 /**
@@ -75,17 +74,23 @@ const displayCart = async (productsInCart) => {
  */
 const updateCart = (domElt, targetValue) => {
 
+  // Check if targetvalue parameter has been passed in correcct type
+  if (typeof targetValue != "number") {
+    targetValue = parseInt(targetValue)
+  }
+
   // Targets the parent element and retrieves the "id" and "color" information in its attributes
   let currentElt = domElt.closest("article")
   let currentEltId = currentElt.getAttribute('data-id')
   let currentEltColor = currentElt.getAttribute('data-color')
 
-  // Find the current product from the cart
+  // Find the current product in the cart
   let foundProduct = cart.find(product => product.id == currentEltId && product.color == currentEltColor)
   foundProduct.quantity = targetValue
 
   // Remove the product from the cart and the DOM
   if (foundProduct.quantity <= 0) {
+    console.log(foundProduct.quantity)
     cart.splice(cart.indexOf(foundProduct), 1)
     currentElt.remove()
   }
@@ -160,7 +165,7 @@ const setTotalQuantity = () => {
 }
 
 /**
- * Calculte the total price of the items 
+ * Calculate the total price of the items 
  * @returns {number}
  */
 const setTotalPrice = async () => {
@@ -199,21 +204,20 @@ const setListeners = async () => {
 
 /** Gestion du formulaire **/
 
-
-
-
-/** Templates des fonctions*/
-
-
+/**
+ * Check form fields and write an error message  in case of error
+ * @param {string} eltId The input Id
+ * @returns 
+ */
 const checkIfValid = (eltId) => {
 
   const inputValidRegex = /^[a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+([-'\s][a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+)?$/
-  const inputValidRegexEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/ // Regex pour l'email 
-  const inputValidRegexCity = /^([0-9]{5}).[a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+([-'\s][a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+)?$/ //Regex ville ex: 75000 Paris
+  const inputValidRegexEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/ // Regex for email 
+  const inputValidRegexCity = /^([0-9]{5}).[a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+([-'\s][a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+)?$/ //Regex city ex: 75000 Paris
 
-  const inputElt = document.getElementById(eltId) // input ID
-  const errorMsgElt = document.getElementById(eltId + "ErrorMsg")
-  const inputLength = inputElt.value.split(' ').length
+  const inputElt = document.getElementById(eltId) // input element
+  const errorMsgElt = document.getElementById(eltId + "ErrorMsg") // error field element
+  const inputLength = inputElt.value.split(' ').length // split the value into words
 
 
   if (inputElt.validity.valueMissing) {
@@ -230,7 +234,7 @@ const checkIfValid = (eltId) => {
 
   if (eltId == "address" && !(inputLength > 2)) {
     errorMsgElt.textContent = "L'adresse doit contenir minimum 3 mots"
-    errorMsgElt.style.color = "white"
+    errorMsgElt.style.color = "orange"
     return false
   }
 
@@ -251,13 +255,19 @@ const checkIfValid = (eltId) => {
 }
 
 
-
-/** Fonction formulaire main */
+/**
+ * Builds the object containing the form data and the products array, and post it
+ * @param {event} e 
+ */
 const postForm = (e) => {
+
   e.preventDefault()
+  // Create an array containing the "ids"
+  // Loop the array, get each "id" and send to the check value function, the function returns an array of booleans
   const formIds = ['firstName', 'lastName', 'address', 'city', 'email']
   const results = formIds.map(id => checkIfValid(id))
 
+  // If the array does not contain false, we build the object and we post
   if (!results.includes(false)) {
 
     const formValues = formIds.map(value => document.getElementById(value).value)
@@ -273,16 +283,18 @@ const postForm = (e) => {
       },
       products: productsId,
     }
-
     postOrder(orderObj)
 
   }
 
 }
 
-
+/**
+ * Request the API using the post method, post the content of the object, and retrieve the order ID
+ * With the order Id , open the confirmation page
+ * @param {Object} orderObj 
+ */
 const postOrder = async (orderObj) => {
-
 
   let response = await fetch(apiUrl + "order", {
     method: "POST",
@@ -296,7 +308,7 @@ const postOrder = async (orderObj) => {
   let resultat = await response.json()
 
   window.location.href = `./confirmation.html?orderId=${resultat.orderId}`
-  console.log(resultat.orderId)
+
 }
 
 
@@ -304,5 +316,8 @@ const postOrder = async (orderObj) => {
 /** Application **/
 
 let cart = getCart()
+
+
+
 await displayCart(cart.sort(sortProducts()))
 await setListeners()

@@ -1,5 +1,6 @@
 import { apiUrl } from "./common.js"
 import { createHtmlElement } from "./common.js"
+import { getCart } from "./common.js"
 
 //On instancie URL en lui passant en paramètre l'adresse de la page
 const url = new URL(window.location.href)
@@ -121,20 +122,20 @@ const saveCart = (cart) => {
  * 
  * @returns {JSON}
  */
-const getCart = () => {
+// const getCart = () => {
 
-    let cart = localStorage.getItem("cart")
-    //si le localStorage est vide , retourne un tableau vide
-    if (cart == null) {
+//     let cart = localStorage.getItem("cart")
+//     //si le localStorage est vide , retourne un tableau vide
+//     if (cart == null) {
 
-        return [];
-        // sinon retourne la valeur recuperée (string) et la retourne en JSON
-    } else {
+//         return [];
+//         // sinon retourne la valeur recuperée (string) et la retourne en JSON
+//     } else {
 
-        return JSON.parse(cart)
-    }
+//         return JSON.parse(cart)
+//     }
 
-}
+// }
 
 
 //Fonction qui réagis au clic. Récupere le localStorage, verifie que la couleur et l'id existe deja 
@@ -155,7 +156,9 @@ const addCart = () => {
         // Si un index est trouvé, ajoute la quantité du currentproduct a [index].quantity
         if (foundProductIndex >= 0) {
 
+            // parseInt(objCart[foundProductIndex].quantity) += currentQtyProduct
             objCart[foundProductIndex].quantity += currentQtyProduct
+
 
         } else {
             let currentItem = {
