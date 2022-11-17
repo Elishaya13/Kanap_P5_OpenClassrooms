@@ -121,6 +121,7 @@ const addCart = () => {
     let localCart = getCart()
     const currentQtyProduct = parseInt(document.getElementById('quantity').value)
     const currentColorProduct = document.getElementById('colors').value
+    const currentName = document.getElementById('title').textContent
 
     if (currentColorProduct != "choose" && currentQtyProduct > 0 && currentQtyProduct <= 100) {
 
@@ -144,6 +145,7 @@ const addCart = () => {
         }
 
         saveCart(localCart)
+        alert(`${currentQtyProduct} ${currentName} de couleur ${currentColorProduct} a bien été ajouté au panier !`)
     } else {
         alert("Merci de saisir une quantité (entre 1 et 100) et une couleur")
     }
