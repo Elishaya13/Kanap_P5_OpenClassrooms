@@ -29,8 +29,11 @@ export const getCart = () => {
     }
 }
 
-// Sauvegarde les données passées dans le localStorage (key + string)
-const saveCart = (cart) => {
+/**
+ * Transforms the data into string and saves it in localStorage
+ * @param {JSON} cart 
+ */
+export const saveCart = (cart) => {
 
     localStorage.setItem("cart", JSON.stringify(cart))
 

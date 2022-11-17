@@ -1,29 +1,8 @@
 import { apiUrl } from "./common.js"
-import MyCart from "./MyCart.js";
+import { saveCart } from "./common.js";
+import { getCart } from "./common.js";
 
 /** Affichage du panier et total */
-
-/**
- * Retrieves the data saved in the localStorage and returns them in a JSON/Object
- * @returns {{id: String, color: String, quantity: String}[]} 
- */
-const getCart = () => {
-
-  let cart = localStorage.getItem("cart")
-  if (cart == null) {
-    return [];
-  } else {
-    return JSON.parse(cart)
-  }
-}
-
-/**
- * Transforms the data into a string and saves it in the localStorage
- * @param {JSON} cart 
- */
-const saveCart = () => {
-  localStorage.setItem("cart", JSON.stringify(cart))
-}
 
 /**
  * Query the product API and return the data from the URL in a JSON
@@ -69,14 +48,14 @@ const displayCart = async (productsInCart) => {
 }
 
 /**
- * Browse the current basket, modify the quantity by the new value entered or delete the product
+ * Browse the current cart, modify the quantity by the new value entered or delete the product
  * @param {number} targetValue
  */
-const updateCart = (domElt, targetValue) => {
+const updateCart = (domElt, quantityValue) => {
 
-  // Check if targetvalue parameter has been passed in correcct type
-  if (typeof targetValue != "number") {
-    targetValue = parseInt(targetValue)
+  // Check if target value parameter has been passed in correcct type
+  if (typeof quantityValue != "number") {
+    quantityValue = parseInt(quantityValue)
   }
 
   // Targets the parent element and retrieves the "id" and "color" information in its attributes
@@ -86,11 +65,10 @@ const updateCart = (domElt, targetValue) => {
 
   // Find the current product in the cart
   let foundProduct = cart.find(product => product.id == currentEltId && product.color == currentEltColor)
-  foundProduct.quantity = targetValue
+  foundProduct.quantity = quantityValue
 
   // Remove the product from the cart and the DOM
   if (foundProduct.quantity <= 0) {
-    console.log(foundProduct.quantity)
     cart.splice(cart.indexOf(foundProduct), 1)
     currentElt.remove()
   }
@@ -98,7 +76,7 @@ const updateCart = (domElt, targetValue) => {
   setTotalPrice()
 
   // Save it to the localStorage
-  saveCart()
+  saveCart(cart)
 }
 
 /**
@@ -134,22 +112,6 @@ const displayAProduct = (product, fetchProductJson) => {
          `
   return productElt
 }
-
-/**
- * Sort products by ID
- */
-const sortProducts = () => {
-
-  cart.sort(function (a, b) {
-    if (a.id < b.id)
-      return -1
-    if (a.id > b.id)
-      return 1
-    if (a.id === b.id)
-      return 0
-  })
-}
-
 
 /**
  * Calculate the total number of items
@@ -200,6 +162,27 @@ const setListeners = async () => {
     buttonSuppr.addEventListener('click', () => (updateCart(buttonSuppr, 0)))
   )
   document.getElementById('order').addEventListener('click', postForm)
+}
+/**
+ * Sort products by ID
+ * @param {Json}cart
+ */
+const getSortedProducts = (cart) => {
+
+  return cart.sort(function (a, b) {
+    if (a.id < b.id)
+      return -1
+    if (a.id > b.id)
+      return 1
+    if (a.id === b.id)
+      return 0
+  })
+}
+// Remove localstorage content and cart html content
+const removeCart = () => {
+  let sectionCartElt = document.getElementById('cart__items')
+  localStorage.clear()
+  sectionCartElt.innerHTML = ""
 }
 
 /** Gestion du formulaire **/
@@ -254,7 +237,6 @@ const checkIfValid = (eltId) => {
   }
 }
 
-
 /**
  * Builds the object containing the form data and the products array, and post it
  * @param {event} e 
@@ -271,7 +253,7 @@ const postForm = (e) => {
   if (!results.includes(false)) {
 
     const formValues = formIds.map(value => document.getElementById(value).value)
-    const productsId = getCart().map(product => product.id)
+    const productsId = cart.map(product => product.id)
 
     const orderObj = {
       contact: {
@@ -284,6 +266,7 @@ const postForm = (e) => {
       products: productsId,
     }
     postOrder(orderObj)
+    removeCart()
 
   }
 
@@ -311,13 +294,10 @@ const postOrder = async (orderObj) => {
 
 }
 
-
-
 /** Application **/
 
 let cart = getCart()
 
-
-
-await displayCart(cart.sort(sortProducts()))
+await displayCart(getSortedProducts(cart))
 await setListeners()
+

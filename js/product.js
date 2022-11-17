@@ -1,6 +1,7 @@
 import { apiUrl } from "./common.js"
 import { createHtmlElement } from "./common.js"
 import { getCart } from "./common.js"
+import { saveCart } from "./common.js"
 
 //On instancie URL en lui passant en paramètre l'adresse de la page
 const url = new URL(window.location.href)
@@ -19,7 +20,6 @@ const getProduct = async () => {
     return await r.json()
 
 }
-
 //------- Display functions ---------//
 
 /**
@@ -55,6 +55,7 @@ const addProductImg = (imageUrl, altTxt) => {
 
 }
 /**
+ * Add product name info
  * @param {String} productName 
  */
 const addProductName = (productName) => {
@@ -64,6 +65,7 @@ const addProductName = (productName) => {
 }
 
 /**
+ * Add product price info
  * @param {Number} productPrice 
  */
 const addProductPrice = (productPrice) => {
@@ -74,7 +76,8 @@ const addProductPrice = (productPrice) => {
 }
 
 /**
- * @param {String} productDescription 
+ * add product description info
+ * @param {String} productDescription - jsonInfo.description
  */
 const addProductDescription = (productDescription) => {
     document
@@ -107,80 +110,52 @@ const addSelectColorsOption = (productColors) => {
 }
 
 
-//-----Fonctions pour local storage et ajout panier -----//
+//-----Fonctions pour  le panier -----//
 
-
-// Sauvegarde les données passées dans le localStorage (key + string)
-const saveCart = (cart) => {
-
-    localStorage.setItem("cart", JSON.stringify(cart))
-
-}
-
-// Recupere les données sauvegardées dans le localStorage (string) et les retourne sous forme de Json/Objet
 /**
- * 
- * @returns {JSON}
+ * Get the product values and save it to localStorage 
  */
-// const getCart = () => {
-
-//     let cart = localStorage.getItem("cart")
-//     //si le localStorage est vide , retourne un tableau vide
-//     if (cart == null) {
-
-//         return [];
-//         // sinon retourne la valeur recuperée (string) et la retourne en JSON
-//     } else {
-
-//         return JSON.parse(cart)
-//     }
-
-// }
-
-
-//Fonction qui réagis au clic. Récupere le localStorage, verifie que la couleur et l'id existe deja 
-//Si oui incrémente la quantité du produit de la valeur récuperée currentQty 
-//Sinon ajoute au panier/localstorage /les valeurs current id, currentcolor et current qty 
 const addCart = () => {
+
     // On recupere le panier qui existe dans le local storage
-    let objCart = getCart()
+    let localCart = getCart()
     const currentQtyProduct = parseInt(document.getElementById('quantity').value)
     const currentColorProduct = document.getElementById('colors').value
-
 
     if (currentColorProduct != "choose" && currentQtyProduct > 0 && currentQtyProduct <= 100) {
 
         // findIndex va retourner l'index du produit correspondant (meme id + meme color) ou -1
-        let foundProductIndex = objCart.findIndex(element => element.id == currentIdProduct && element.color == currentColorProduct)
+        let foundProductIndex = localCart.findIndex(element => element.id == currentIdProduct && element.color == currentColorProduct)
 
         // Si un index est trouvé, ajoute la quantité du currentproduct a [index].quantity
         if (foundProductIndex >= 0) {
 
             // parseInt(objCart[foundProductIndex].quantity) += currentQtyProduct
-            objCart[foundProductIndex].quantity += currentQtyProduct
+            localCart[foundProductIndex].quantity += currentQtyProduct
 
-
+            // Sinon creer le tableau des valeurs du produit et l'ajoute au tableau du localstorage
         } else {
             let currentItem = {
                 id: currentIdProduct,
                 color: currentColorProduct,
                 quantity: currentQtyProduct
             }
-            //on lui ajoute le produit
-            objCart.push(currentItem)
+            localCart.push(currentItem)
         }
 
-        saveCart(objCart)
+        saveCart(localCart)
     } else {
         alert("Merci de saisir une quantité (entre 1 et 100) et une couleur")
     }
 }
 
-
-// Ajout d'un evenement sur le clic du bouton Ajouter au panier
+// Add a button click event : "Ajouter au panier"
 document.getElementById("addToCart")
     .addEventListener("click", addCart)
 
-// Affichage du produit au chargement de la page
+//** Application  **/
+
+
+// Display the product
 getProduct().then(jsonInfo => displayProduct(jsonInfo))
 

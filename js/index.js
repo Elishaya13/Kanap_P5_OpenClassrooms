@@ -1,29 +1,26 @@
 import { apiUrl, baseFrontURL } from "./common.js"
 
-
-//On récupère les données de l'API
-//To do verifier a faire fonctionner le catch
 /**
- * 
+ * Get data from API
  * @returns {Promise<JSON>} Promise object represents the Json of the API
  */
 const getProducts = async () => {
+
     let r = await fetch(apiUrl)
     let json = await r.json()
     return json
 }
 
 
-
 /**
  * Loop on json object and write html content
- * @param {JSON} articles
+ * @param {JSON} productsJson - API product result 
  */
-const showArticles = (articles) => {
+const showArticles = (productsJson) => {
 
     let displayHtml = ''
-    //On boucle sur chaque article pour y créer et ajouter le contenu HTML
-    for (let article of articles) {
+    //Loop on each article and create the html content with Json infos
+    for (let article of productsJson) {
 
         displayHtml += `
             <a href="${baseFrontURL}/product.html?id=${article._id}">
@@ -34,10 +31,14 @@ const showArticles = (articles) => {
                 </article>
             </a> 
          `
-
     }
-    //On récupère l'élément parent et on insert le code HTML
+    // Get parent element and insert to the Html code
     document.getElementById('items').insertAdjacentHTML('beforeend', displayHtml)
 }
 
-getProducts().then(json => showArticles(json))
+
+getProducts()
+    .then(json => showArticles(json))
+    .catch(err =>
+        document.querySelector("#items").innerHTML = `<p style = "color:red">${err}  Merci de démarrer votre back end </p>`
+    )
