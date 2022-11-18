@@ -1,4 +1,4 @@
-import { saveCart, getCart, fetchProduct } from "./common.js";
+import { saveCart, getCart, fetchProduct, postOrder } from "./common.js";
 import { formMsg } from "./errorMsg.js";
 
 
@@ -20,7 +20,7 @@ const displayCart = async (productsInCart) => {
   // Add the "string" HTML content created using the data
   for (let product of productsInCart) {
 
-    if (product.id != lastProductId) {
+    if (product.id !== lastProductId) {
       lastProductId = product.id
       fetchProductJson = await fetchProduct(product.id)
     }
@@ -43,7 +43,7 @@ const displayCart = async (productsInCart) => {
 const updateCart = (domElt, quantityValue) => {
 
   // Check if target value parameter has been passed in correcct type
-  if (typeof quantityValue != "number") {
+  if (typeof quantityValue !== "number") {
     quantityValue = parseInt(quantityValue)
   }
 
@@ -125,7 +125,7 @@ const setTotalPrice = async () => {
   let productPrice = 0
   for (let product of cart) {
 
-    if (product.id != lastProductId) {
+    if (product.id !== lastProductId) {
 
       lastProductId = product.id
       fetchProductJson = await fetchProduct(product.id)
@@ -167,19 +167,14 @@ const getSortedProducts = (cart) => {
       return 0
   })
 }
-// Remove localstorage content and cart html content
-const removeCart = () => {
-  let sectionCartElt = document.getElementById('cart__items')
-  localStorage.clear()
-  sectionCartElt.innerHTML = ""
-}
+
 
 /** Gestion du formulaire **/
 
 /**
  * Check form fields and write an error message  in case of error
- * @param {string} eltId The input Id
- * @returns 
+ * @param {string} eltId The form input element Id
+ * @returns {boolean} 
  */
 const checkIfValid = (eltId) => {
 
@@ -229,6 +224,7 @@ const checkIfValid = (eltId) => {
     )
     return false
   }
+
   if ((eltId == "firstName" || eltId == "lastName") && !inputValidRegex.test(inputElt.value)) {
 
     displayFormErrorMsg(
@@ -243,6 +239,12 @@ const checkIfValid = (eltId) => {
     return true
   }
 }
+/**
+ * Display form error messages 
+ * @param {string} eltId - id of the form input element ex: "city", "email"..
+ * @param {string} errorMsg 
+ * @param {string} colorMsg 
+ */
 const displayFormErrorMsg = (eltId, errorMsg = null, colorMsg = null) => {
   const errorMsgElt = document.getElementById(eltId + "ErrorMsg") // error field element
   errorMsgElt.textContent = errorMsg
@@ -258,12 +260,12 @@ const postForm = (e) => {
 
   e.preventDefault()
   // Create an array containing the "ids"
-  // Loop the array, get each "id" and send to the check value function, the function returns an array of booleans
+  // Send each ids to the check value function, an array of booleans is generated
   const formIds = ['firstName', 'lastName', 'address', 'city', 'email']
   const results = formIds.map(id => checkIfValid(id))
 
-  // If the array does not contain false, we build the object and we post
-  if (!results.includes(false)) {
+  // If the array does not contain false and the cart is not empty, we build the object and we post
+  if (!results.includes(false) && cart.length > 0) {
 
     const formValues = formIds.map(value => document.getElementById(value).value)
     const productsId = cart.map(product => product.id)
@@ -276,34 +278,18 @@ const postForm = (e) => {
         city: formValues[3],
         email: formValues[4]
       },
+
+
       products: productsId,
     }
-    postOrder(orderObj)
-    removeCart()
 
+    postOrder(orderObj)
+
+
+  } else if (cart.length === 0) {
+    alert("Votre panier est vide")
   }
 
-}
-
-/**
- * Request the API using the post method, post the content of the object, and retrieve the order ID
- * With the order Id , open the confirmation page
- * @param {Object} orderObj 
- */
-const postOrder = async (orderObj) => {
-
-  let response = await fetch(apiUrl + "order", {
-    method: "POST",
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json;charset=utf-8'
-    },
-    body: JSON.stringify(orderObj),
-  })
-
-  let resultat = await response.json()
-
-  window.location.href = `./confirmation.html?orderId=${resultat.orderId}`
 
 }
 

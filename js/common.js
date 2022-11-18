@@ -24,7 +24,7 @@ export function createHtmlElement(tagName, attributes = {}) {
 export const getCart = () => {
 
     let cart = localStorage.getItem("cart")
-    if (cart == null) {
+    if (cart === null) {
         return [];
     } else {
         return JSON.parse(cart)
@@ -61,4 +61,26 @@ export const fetchProduct = async (productId) => {
 
     const r = await fetch(apiUrl + productId)
     return await r.json()
+}
+
+/**
+ * Request the API using the post method, post the content of the object, and retrieve the order ID
+ * With the order Id , open the confirmation page
+ * @param {Object} orderObj 
+ */
+export const postOrder = async (orderObj) => {
+
+    let response = await fetch(apiUrl + "order", {
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify(orderObj),
+    })
+
+    let resultat = await response.json()
+
+    window.location.href = `./confirmation.html?orderId=${resultat.orderId}`
+
 }

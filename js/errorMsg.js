@@ -23,5 +23,8 @@ export const formMsg = {
     }
 
 }
-
+export const confirmationMsg = {
+    errMsg: "Une erreur est survenue, veuillez recommencer svp",
+    color: "red"
+}
 
