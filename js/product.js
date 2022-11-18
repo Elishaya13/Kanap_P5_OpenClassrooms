@@ -1,26 +1,15 @@
-//import { apiUrl } from "./common.js"
-import { createHtmlElement, getCart, saveCart, fetchProduct } from "./common.js"
+import { getCart, saveCart, fetchProduct } from "./common.js"
 
-//On instancie URL en lui passant en paramètre l'adresse de la page
+// We instantiate URL by passing it the address of the page as a parameter
 const url = new URL(window.location.href)
 
-//We retrieve the value of the id parameter passed in the URL
+// We retrieve the value of the id parameter passed in the URL
 const currentIdProduct = url.searchParams.get('id')
 
-
-/**
- * Gets a Json object for a product by its id
- * @returns {Promise<JSON>} Promise object represents the Json of the API
- */
-// const getProduct = async () => {
-//     const r = await fetch(apiUrl + currentIdProduct)
-//     return await r.json()
-
-// }
 //------- Display functions ---------//
 
 /**
- * Use the Json API and call the other functions to add product infos
+ * Display all the product infos
  * @param {JSON} jsonInfo 
  */
 const displayProduct = (jsonInfo) => {
@@ -39,16 +28,11 @@ const displayProduct = (jsonInfo) => {
  */
 const addProductImg = (imageUrl, altTxt) => {
     let imgEltParent = document.querySelector('div.item__img')
-    let imageElt = createHtmlElement('img', {
-        src: `${imageUrl}`,
-        alt: `${altTxt}`
-    })
+    let imageElt = document.createElement('img')
+
+    imageElt.setAttribute('src', `${imageUrl}`)
+    imageElt.setAttribute('alt', `${altTxt}`)
     imgEltParent.appendChild(imageElt)
-
-    //let imageElt = document.createElement('img')
-    // imageElt.setAttribute('src', `${imageUrl}`)
-    // imageElt.setAttribute('alt', `${altTxt}`)
-
 
 }
 /**
@@ -84,17 +68,18 @@ const addProductDescription = (productDescription) => {
 }
 
 /**
- * Loop on json object and write <option> html content
+ * Loop on json object and write the <option> html content
  * @param {string[]} productColors 
  */
 const addSelectColorsOption = (productColors) => {
+
     let optionParentElt = document.getElementById('colors')
+    //Add a value "choose" for the first option
+    document
+        .querySelector('#colors > option')
+        .setAttribute('value', 'choose')
 
-    // J'ajoute la valeur "choose" dans ma première option pour pouvoir après l'exclure des conditions valable d'ajout au panier
-    let firstOptionElt = document.querySelector('#colors > option')
-    firstOptionElt.setAttribute('value', 'choose')
-
-    //Pour chaque couleur disponible dans mon tableau du produit , crée une balise <option> avec les valeurs disponible
+    // Create the DOM options elements and insert to the colors options values
     for (let color of productColors) {
 
         let newOptionElt = document.createElement('option')
@@ -106,7 +91,6 @@ const addSelectColorsOption = (productColors) => {
     }
 }
 
-
 //-----Fonctions pour  le panier-----//
 
 /**
@@ -114,22 +98,20 @@ const addSelectColorsOption = (productColors) => {
  */
 const addCart = () => {
 
-    // On recupere le panier qui existe dans le local storage
+    // Get the cart from localStorage
     let localCart = getCart()
     const currentQtyProduct = parseInt(document.getElementById('quantity').value)
     const currentColorProduct = document.getElementById('colors').value
     const currentName = document.getElementById('title').textContent
 
+    // If the same product already exists increase its quantity, otherwise create the object data and send it to localStorage
     if (currentColorProduct != "choose" && currentQtyProduct > 0 && currentQtyProduct <= 100) {
 
-        // findIndex va retourner l'index du produit correspondant (meme id + meme color) ou -1
         let foundProductIndex = localCart.findIndex(element => element.id == currentIdProduct && element.color == currentColorProduct)
 
-        // Si un index est trouvé, ajoute la quantité du currentproduct a [index].quantity
         if (foundProductIndex >= 0) {
             localCart[foundProductIndex].quantity += currentQtyProduct
 
-            // Sinon creer le tableau des valeurs du produit et l'ajoute au tableau du localstorage
         } else {
             let currentItem = {
                 id: currentIdProduct,
@@ -140,6 +122,7 @@ const addCart = () => {
         }
 
         saveCart(localCart)
+
         alert(`${currentQtyProduct} ${currentName} de couleur ${currentColorProduct} a bien été ajouté au panier !`)
     } else {
         alert("Merci de saisir une quantité (entre 1 et 100) et une couleur")

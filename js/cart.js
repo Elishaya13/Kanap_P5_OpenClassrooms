@@ -38,11 +38,11 @@ const displayCart = async (productsInCart) => {
 
 /**
  * Browse the current cart, modify the quantity by the new value entered or delete the product
- * @param {number} targetValue
+ * @param {number} quantityValue - value present in the input quantity 
  */
 const updateCart = (domElt, quantityValue) => {
 
-  // Check if target value parameter has been passed in correcct type
+  // Check if target value parameter has been passed in correct type
   if (typeof quantityValue !== "number") {
     quantityValue = parseInt(quantityValue)
   }
@@ -52,7 +52,7 @@ const updateCart = (domElt, quantityValue) => {
   let currentEltId = currentElt.getAttribute('data-id')
   let currentEltColor = currentElt.getAttribute('data-color')
 
-  // Find the current product in the cart
+  // Find the current product in the cart, if it find, modify quantity value
   let foundProduct = cart.find(product => product.id == currentEltId && product.color == currentEltColor)
   foundProduct.quantity = quantityValue
 
@@ -139,7 +139,7 @@ const setTotalPrice = async () => {
 }
 
 /**
- * Add a eventListener on the change, on the quantity input element and the delete button element
+ * Set the listeners, for the quantity change, the delete button and the form button
  */
 const setListeners = async () => {
   // Eventlistener on the quantity input
@@ -167,7 +167,6 @@ const getSortedProducts = (cart) => {
       return 0
   })
 }
-
 
 /** Gestion du formulaire **/
 
@@ -278,13 +277,10 @@ const postForm = (e) => {
         city: formValues[3],
         email: formValues[4]
       },
-
-
       products: productsId,
     }
 
     postOrder(orderObj)
-
 
   } else if (cart.length === 0) {
     alert("Votre panier est vide")
