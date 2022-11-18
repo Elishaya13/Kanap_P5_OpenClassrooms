@@ -1,25 +1,22 @@
-import { apiUrl } from "./common.js"
-import { createHtmlElement } from "./common.js"
-import { getCart } from "./common.js"
-import { saveCart } from "./common.js"
+//import { apiUrl } from "./common.js"
+import { createHtmlElement, getCart, saveCart, fetchProduct } from "./common.js"
 
 //On instancie URL en lui passant en paramètre l'adresse de la page
 const url = new URL(window.location.href)
 
-// On récupère la valeur du paramètre id passée dans l'URL
-const idProduct = url.searchParams.get('id')
+//We retrieve the value of the id parameter passed in the URL
+const currentIdProduct = url.searchParams.get('id')
 
-const currentIdProduct = idProduct
 
-//To do export avec getProductId
 /**
+ * Gets a Json object for a product by its id
  * @returns {Promise<JSON>} Promise object represents the Json of the API
  */
-const getProduct = async () => {
-    const r = await fetch(apiUrl + idProduct)
-    return await r.json()
+// const getProduct = async () => {
+//     const r = await fetch(apiUrl + currentIdProduct)
+//     return await r.json()
 
-}
+// }
 //------- Display functions ---------//
 
 /**
@@ -110,7 +107,7 @@ const addSelectColorsOption = (productColors) => {
 }
 
 
-//-----Fonctions pour  le panier -----//
+//-----Fonctions pour  le panier-----//
 
 /**
  * Get the product values and save it to localStorage 
@@ -130,8 +127,6 @@ const addCart = () => {
 
         // Si un index est trouvé, ajoute la quantité du currentproduct a [index].quantity
         if (foundProductIndex >= 0) {
-
-            // parseInt(objCart[foundProductIndex].quantity) += currentQtyProduct
             localCart[foundProductIndex].quantity += currentQtyProduct
 
             // Sinon creer le tableau des valeurs du produit et l'ajoute au tableau du localstorage
@@ -155,9 +150,8 @@ const addCart = () => {
 document.getElementById("addToCart")
     .addEventListener("click", addCart)
 
-//** Application  **/
-
+//----Application-----/
 
 // Display the product
-getProduct().then(jsonInfo => displayProduct(jsonInfo))
+fetchProduct(currentIdProduct).then(jsonInfo => displayProduct(jsonInfo))
 

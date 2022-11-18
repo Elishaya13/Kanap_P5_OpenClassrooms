@@ -2,6 +2,7 @@
 export const baseFrontURL = window.location.href.replace("/index.html", "")
 export const apiUrl = "http://localhost:3000/api/products/"
 
+
 /**
  * Function to create a HTML element with attributes
  * @param {string} tagName 
@@ -15,6 +16,7 @@ export function createHtmlElement(tagName, attributes = {}) {
     }
     return element
 }
+
 /**
  * Retrieves the data saved in the localStorage and returns them in a JSON/Object
  * @returns {{id: String, color: String, quantity: String}[]} 
@@ -37,4 +39,26 @@ export const saveCart = (cart) => {
 
     localStorage.setItem("cart", JSON.stringify(cart))
 
+}
+
+/**
+ * Get data from API
+ * @returns {Promise<JSON>} Promise object represents the Json of the API
+ */
+export const fetchAllProducts = async () => {
+
+    let r = await fetch(apiUrl)
+    let json = await r.json()
+    return json
+}
+
+/**
+ * Query the product API and return the data from the URL in a JSON
+ * @param {string} productId 
+ * @returns {JSON}
+ */
+export const fetchProduct = async (productId) => {
+
+    const r = await fetch(apiUrl + productId)
+    return await r.json()
 }

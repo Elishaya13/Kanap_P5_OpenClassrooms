@@ -1,4 +1,5 @@
-import { apiUrl, baseFrontURL } from "./common.js"
+import { baseFrontURL, fetchAllProducts } from "./common.js"
+
 
 /**
  * Get data from API
@@ -10,7 +11,6 @@ const getProducts = async () => {
     let json = await r.json()
     return json
 }
-
 
 /**
  * Loop on json object and write html content
@@ -37,7 +37,7 @@ const showArticles = (productsJson) => {
 }
 
 
-getProducts()
+fetchAllProducts()
     .then(json => showArticles(json))
     .catch(err =>
         document.querySelector("#items").innerHTML = `<p style = "color:red">${err}  Merci de démarrer votre back end </p>`

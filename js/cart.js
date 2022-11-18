@@ -1,19 +1,8 @@
-import { apiUrl } from "./common.js"
-import { saveCart } from "./common.js";
-import { getCart } from "./common.js";
+import { saveCart, getCart, fetchProduct } from "./common.js";
+import { formMsg } from "./errorMsg.js";
+
 
 /** Affichage du panier et total */
-
-/**
- * Query the product API and return the data from the URL in a JSON
- * @param {string} productId 
- * @returns {JSON}
- */
-const fetchProduct = async (productId) => {
-
-  const r = await fetch(apiUrl + productId)
-  return await r.json()
-}
 
 /**
  * Display each product from the cart and listen for the quantity change
@@ -197,44 +186,68 @@ const checkIfValid = (eltId) => {
   const inputValidRegex = /^[a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+([-'\s][a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+)?$/
   const inputValidRegexEmail = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/ // Regex for email 
   const inputValidRegexCity = /^([0-9]{5}).[a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+([-'\s][a-zA-ZéèîïÉÈÎÏ][a-zéèêàçîï]+)?$/ //Regex city ex: 75000 Paris
+  const inputValidRegexAddress = /^[a-zA-Z0-9àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœ\s\,\'\-]*$/
 
   const inputElt = document.getElementById(eltId) // input element
-  const errorMsgElt = document.getElementById(eltId + "ErrorMsg") // error field element
   const inputLength = inputElt.value.split(' ').length // split the value into words
 
-
   if (inputElt.validity.valueMissing) {
-    errorMsgElt.textContent = "Le champ ne doit pas être vide"
-    errorMsgElt.style.color = "red"
+    displayFormErrorMsg(
+      eltId,
+      formMsg.emptyField.errorMsg,
+      formMsg.emptyField.errorColor
+    )
     return false
   }
 
   if (eltId == "email" && !inputValidRegexEmail.test(inputElt.value)) {
-    errorMsgElt.textContent = "Le champ doit contenir un email valide"
-    errorMsgElt.style.color = "yellow"
+
+    displayFormErrorMsg(
+      eltId,
+      formMsg.email.errorMsg,
+      formMsg.email.errorColor
+    )
     return false
   }
 
-  if (eltId == "address" && !(inputLength > 2)) {
-    errorMsgElt.textContent = "L'adresse doit contenir minimum 3 mots"
-    errorMsgElt.style.color = "orange"
+  if (eltId == "address" && (!inputValidRegexAddress.test(inputElt.value) || !(inputLength > 2))) {
+
+    displayFormErrorMsg(
+      eltId,
+      formMsg.address.errorMsg,
+      formMsg.address.errorColor
+    )
     return false
   }
 
   if (eltId == "city" && !inputValidRegexCity.test(inputElt.value)) {
-    errorMsgElt.textContent = "Le champ doit contenir le code postal et la ville (ex: 75000 Paris)"
-    errorMsgElt.style.color = "pink"
+
+    displayFormErrorMsg(
+      eltId,
+      formMsg.city.errorMsg,
+      formMsg.city.errorColor
+    )
     return false
   }
   if ((eltId == "firstName" || eltId == "lastName") && !inputValidRegex.test(inputElt.value)) {
-    errorMsgElt.textContent = "Le champ doit contenir un minimum de 2 caractères et ne pas contenir de chiffres"
-    errorMsgElt.style.color = "orange"
+
+    displayFormErrorMsg(
+      eltId,
+      formMsg.name.errorMsg,
+      formMsg.name.errorColor
+    )
     return false
 
   } else {
-    errorMsgElt.textContent = ''
+    displayFormErrorMsg(eltId)
     return true
   }
+}
+const displayFormErrorMsg = (eltId, errorMsg = null, colorMsg = null) => {
+  const errorMsgElt = document.getElementById(eltId + "ErrorMsg") // error field element
+  errorMsgElt.textContent = errorMsg
+  errorMsgElt.style.color = colorMsg
+
 }
 
 /**
