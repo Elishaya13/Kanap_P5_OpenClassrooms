@@ -1,15 +1,15 @@
-import { confirmationMsg } from "./errorMsg.js"
-//On instancie URL en lui passant en paramètre l'adresse de la page
+import { CONFIRMATION_MSG } from "./errorMsg.js"
+// We instantiate URL by passing it the address of the page as a parameter
 const url = new URL(window.location.href)
 
-// On récupère la valeur du paramètre orderId passée dans l'URL
+// Get the orderId value passed on the URL
 const orderId = url.searchParams.get('orderId')
 const orderElt = document.getElementById("orderId")
 
 
 if (orderId == null) {
-    orderElt.innerText = confirmationMsg.errMsg
-    orderElt.style.color = confirmationMsg.color
+    orderElt.innerText = CONFIRMATION_MSG.errMsg
+    orderElt.style.color = CONFIRMATION_MSG.color
 } else {
     orderElt.innerText = orderId
     orderElt.style.fontWeight = "700"

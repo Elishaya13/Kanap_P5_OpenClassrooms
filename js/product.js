@@ -74,7 +74,7 @@ const addProductDescription = (productDescription) => {
 const addSelectColorsOption = (productColors) => {
 
     let optionParentElt = document.getElementById('colors')
-    //Add a value "choose" for the first option
+    // Add a value "choose" for the first option
     document
         .querySelector('#colors > option')
         .setAttribute('value', 'choose')

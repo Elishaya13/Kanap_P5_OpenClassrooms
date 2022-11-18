@@ -1,5 +1,5 @@
 import { saveCart, getCart, fetchProduct, postOrder } from "./common.js";
-import { formMsg } from "./errorMsg.js";
+import { FORM_MSG } from "./errorMsg.js";
 
 
 /** Affichage du panier et total */
@@ -188,8 +188,8 @@ const checkIfValid = (eltId) => {
   if (inputElt.validity.valueMissing) {
     displayFormErrorMsg(
       eltId,
-      formMsg.emptyField.errorMsg,
-      formMsg.emptyField.errorColor
+      FORM_MSG.emptyField.errorMsg,
+      FORM_MSG.emptyField.errorColor
     )
     return false
   }
@@ -198,8 +198,8 @@ const checkIfValid = (eltId) => {
 
     displayFormErrorMsg(
       eltId,
-      formMsg.email.errorMsg,
-      formMsg.email.errorColor
+      FORM_MSG.email.errorMsg,
+      FORM_MSG.email.errorColor
     )
     return false
   }
@@ -208,8 +208,8 @@ const checkIfValid = (eltId) => {
 
     displayFormErrorMsg(
       eltId,
-      formMsg.address.errorMsg,
-      formMsg.address.errorColor
+      FORM_MSG.address.errorMsg,
+      FORM_MSG.address.errorColor
     )
     return false
   }
@@ -218,8 +218,8 @@ const checkIfValid = (eltId) => {
 
     displayFormErrorMsg(
       eltId,
-      formMsg.city.errorMsg,
-      formMsg.city.errorColor
+      FORM_MSG.city.errorMsg,
+      FORM_MSG.city.errorColor
     )
     return false
   }
@@ -228,8 +228,8 @@ const checkIfValid = (eltId) => {
 
     displayFormErrorMsg(
       eltId,
-      formMsg.name.errorMsg,
-      formMsg.name.errorColor
+      FORM_MSG.name.errorMsg,
+      FORM_MSG.name.errorColor
     )
     return false
 
@@ -258,13 +258,19 @@ const displayFormErrorMsg = (eltId, errorMsg = null, colorMsg = null) => {
 const postForm = (e) => {
 
   e.preventDefault()
+
+  if (cart.length === 0) {
+    alert("Votre panier est vide")
+    return
+  }
+
   // Create an array containing the "ids"
   // Send each ids to the check value function, an array of booleans is generated
   const formIds = ['firstName', 'lastName', 'address', 'city', 'email']
   const results = formIds.map(id => checkIfValid(id))
 
   // If the array does not contain false and the cart is not empty, we build the object and we post
-  if (!results.includes(false) && cart.length > 0) {
+  if (!results.includes(false)) {
 
     const formValues = formIds.map(value => document.getElementById(value).value)
     const productsId = cart.map(product => product.id)
@@ -282,12 +288,11 @@ const postForm = (e) => {
 
     postOrder(orderObj)
 
-  } else if (cart.length === 0) {
-    alert("Votre panier est vide")
   }
-
-
 }
+
+
+
 
 /** Application **/
 

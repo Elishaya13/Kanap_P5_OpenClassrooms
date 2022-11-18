@@ -1,6 +1,7 @@
 // We declare the paths that will be used
 export const baseFrontURL = window.location.href.replace("/index.html", "") // Racine
-export const apiUrl = "http://localhost:3000/api/products/"
+export const API_URL = "http://localhost:3000/api/products/"
+export const KEY_STORAGE_CART = "cart"
 
 /**
  * Retrieves the data saved in the localStorage and returns them in a JSON/Object
@@ -8,7 +9,7 @@ export const apiUrl = "http://localhost:3000/api/products/"
  */
 export const getCart = () => {
 
-    let cart = localStorage.getItem("cart")
+    let cart = localStorage.getItem(KEY_STORAGE_CART)
     if (cart === null) {
         return [];
     } else {
@@ -22,7 +23,7 @@ export const getCart = () => {
  */
 export const saveCart = (cart) => {
 
-    localStorage.setItem("cart", JSON.stringify(cart))
+    localStorage.setItem(KEY_STORAGE_CART, JSON.stringify(cart))
 
 }
 
@@ -32,7 +33,7 @@ export const saveCart = (cart) => {
  */
 export const fetchAllProducts = async () => {
 
-    let r = await fetch(apiUrl)
+    let r = await fetch(API_URL)
     let json = await r.json()
     return json
 }
@@ -44,7 +45,7 @@ export const fetchAllProducts = async () => {
  */
 export const fetchProduct = async (productId) => {
 
-    const r = await fetch(apiUrl + productId)
+    const r = await fetch(API_URL + productId)
     return await r.json()
 }
 
@@ -55,7 +56,7 @@ export const fetchProduct = async (productId) => {
  */
 export const postOrder = async (orderObj) => {
 
-    let response = await fetch(apiUrl + "order", {
+    let response = await fetch(API_URL + "order", {
         method: "POST",
         headers: {
             'Accept': 'application/json',

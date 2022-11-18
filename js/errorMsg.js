@@ -1,6 +1,6 @@
 // Set variables related to error messages and colors
 
-export const formMsg = {
+export const FORM_MSG = {
     name: {
         errorMsg: "Le champ doit contenir un minimum de 2 caractères et ne pas contenir de chiffres",
         errorColor: "orange"
@@ -23,7 +23,7 @@ export const formMsg = {
     }
 
 }
-export const confirmationMsg = {
+export const CONFIRMATION_MSG = {
     errMsg: "Une erreur est survenue, veuillez recommencer svp",
     color: "red"
 }
