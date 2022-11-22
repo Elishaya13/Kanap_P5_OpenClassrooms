@@ -9,7 +9,7 @@ const orderElt = document.getElementById("orderId")
 
 if (orderId == null) {
     orderElt.innerText = CONFIRMATION_MSG.errMsg
-    orderElt.style.color = CONFIRMATION_MSG.color
+    orderElt.style.color = CONFIRMATION_MSG.errColor
 } else {
     orderElt.innerText = orderId
     orderElt.style.fontWeight = "700"
