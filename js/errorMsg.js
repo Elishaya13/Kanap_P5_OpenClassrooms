@@ -3,7 +3,7 @@
 export const FORM_MSG = {
     name: {
         errorMsg: "Le champ doit contenir un minimum de 2 caractères et ne pas contenir de chiffres",
-        errorColor: "orange"
+        errorColor: "yellow"
     },
     address: {
         errorMsg: "Le champ doit contenir un format d'adresse valide et au moins 2 mots",
