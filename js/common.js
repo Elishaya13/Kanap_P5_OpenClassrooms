@@ -1,6 +1,6 @@
 // We declare the paths that will be used
 export const baseFrontURL = window.location.href.replace("/index.html", "") // Racine
-export const API_URL = "http://localhost:3000/api/products/"
+export const API_URL = "https://kanap.angiepons.fr/api/products/"
 export const KEY_STORAGE_CART = "cart"
 
 /**
